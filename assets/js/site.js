@@ -5,9 +5,18 @@
   var LAT = 59.437, LON = 24.7536, R = Math.PI / 180, TZ = 'Europe/Tallinn';
   var root = document.documentElement;
   root.classList.add('js');
+  var REDUCE = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  /* Sun altitude in degrees at time t (ms), accurate to ~1° — enough for a sky. */
-  function sunAlt(t) {
+  /* First visit of the home page in this session: the sentence arrives with the sun (see html.intro in CSS) */
+  var INTRO = false;
+  if (!REDUCE && root.getAttribute('data-page') === 'home') {
+    try { INTRO = !sessionStorage.getItem('intro'); sessionStorage.setItem('intro', '1'); } catch (e) { INTRO = true; }
+    if (INTRO) root.classList.add('arriving');
+  }
+
+  /* Sun altitude and azimuth in degrees at time t (ms), accurate to ~1° — enough for a sky. */
+  function sunAlt(t) { return sun(t).alt; }
+  function sun(t) {
     var d = t / 864e5 - 10957.5;
     var g = R * (357.529 + 0.98560028 * d);
     var q = 280.459 + 0.98564736 * d;
@@ -16,7 +25,10 @@
     var ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
     var dec = Math.asin(Math.sin(e) * Math.sin(L));
     var H = R * ((18.697374558 + 24.06570982441908 * d) * 15 + LON) - ra;
-    return Math.asin(Math.sin(R * LAT) * Math.sin(dec) + Math.cos(R * LAT) * Math.cos(dec) * Math.cos(H)) / R;
+    return {
+      alt: Math.asin(Math.sin(R * LAT) * Math.sin(dec) + Math.cos(R * LAT) * Math.cos(dec) * Math.cos(H)) / R,
+      az: Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(R * LAT) - Math.tan(dec) * Math.cos(R * LAT)) / R + 180
+    };
   }
   function skyFor(a) { return a >= 10 ? 'day' : a >= 0 ? 'low' : a >= -6 ? 'blue' : a >= -12 ? 'dusk' : 'night'; }
   var WORDS = { day: 'daylight', low: 'low sun', blue: 'blue hour', dusk: 'twilight', night: 'night' };
@@ -28,9 +40,13 @@
 
   var alt = 0, real = 'night';
   function applySky() {
-    alt = sunAlt(Date.now()); real = skyFor(alt);
+    var pos = sun(Date.now());
+    alt = pos.alt; real = skyFor(alt);
     var p = pref(), s = forced || (p === 'day' ? 'day' : p === 'night' ? 'night' : real);
     root.setAttribute('data-sky', s);
+    /* The page is a window facing south: east on the left, west on the right, the horizon at the bottom edge */
+    root.style.setProperty('--gx', Math.max(-40, Math.min(140, (pos.az - 90) / 180 * 100)).toFixed(1) + '%');
+    root.style.setProperty('--gy', (100 - alt * 1.6).toFixed(1) + '%');
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', BG[s]);
   }
@@ -94,8 +110,8 @@
   }
   function travelDot(now) {
     /* On load the sun travels from midnight to now: it shows where in the day Tallinn is. */
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { placeDot(now); return; }
-    var start = null, from = today.m0, dur = 1500;
+    if (REDUCE) { placeDot(now); return; }
+    var start = null, from = today.m0, dur = INTRO ? 2600 : 1200;
     function f(ts) {
       if (start === null) start = ts;
       var k = Math.min(1, (ts - start) / dur), e = 1 - Math.pow(1 - k, 3);
@@ -134,6 +150,7 @@
         im.src = a.getAttribute('data-cover');
       }
       function on() {
+        if (fine && !root.classList.contains('arriving')) { a.classList.remove('play'); void a.offsetWidth; a.classList.add('play'); }
         active = a; hovering = true;
         var cur = imgs[slug];
         win.classList.toggle('showing', !!cur);
@@ -141,6 +158,7 @@
         cap.textContent = a.getAttribute('data-meta');
       }
       function off() {
+        a.classList.remove('play');
         if (active !== a) return;
         active = null; hovering = false;
         win.classList.remove('showing');
@@ -154,7 +172,7 @@
 
   /* Case pages: images and films load from assets/work/...; a missing file shows where to put it */
   function initMedia() {
-    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduce = REDUCE;
     Array.prototype.forEach.call(document.querySelectorAll('.shot[data-src]'), function (f) {
       var src = f.getAttribute('data-src'), frame = f.querySelector('.frame'), isV = /\.(mp4|webm)$/i.test(src);
       var m = document.createElement(isV ? 'video' : 'img');
@@ -198,6 +216,7 @@
     if (sunSvg) buildSun();
     initPreview(); initMedia(); initStrikes(); initLight(); updateTexts();
     if (sunSvg) travelDot(Date.now());
+    if (INTRO) setTimeout(function () { root.classList.remove('arriving'); }, 3400);
     setInterval(function () {
       applySky();
       if (sunSvg) { if (midnight(Date.now()) !== today.m0) buildSun(); placeDot(Date.now()); }
