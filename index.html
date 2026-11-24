@@ -14,13 +14,13 @@
 <link rel="preload" href="assets/fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/newsreader-latin-wght-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>(function(d){d.classList.add('js');var m=null;try{m=localStorage.getItem('motion')}catch(e){}if(m==='off'||(m!=='on'&&matchMedia('(prefers-reduced-motion: reduce)').matches))d.classList.add('calm')})(document.documentElement)</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
   <a class="me" href="index.html">Andrii Shnayder</a>
-  <nav aria-label="Main"><a href="index.html#work" aria-current="page">Work</a><a href="about/index.html">About</a><a class="" href="https://www.linkedin.com/in/andrii-shnayder-a15bb8440/" target="_blank" rel="noopener">LinkedIn<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg><span class="sr"> (opens in a new tab)</span></a></nav>
+  <nav aria-label="Main"><button class="motion motion--top" type="button" data-motion hidden></button><a href="index.html#work" aria-current="page">Work</a><a href="about/index.html">About</a><a class="" href="https://www.linkedin.com/in/andrii-shnayder-a15bb8440/" target="_blank" rel="noopener">LinkedIn<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg><span class="sr"> (opens in a new tab)</span></a></nav>
 </div></header>
 <main id="main">
 
@@ -96,6 +96,7 @@
   </div>
   <div class="legal">
     <p>Bolt and Tallink projects are independent concepts, not affiliated with or endorsed by those companies.</p>
+    <p><button class="motion" type="button" data-motion></button></p>
     <p>© 2026 Andrii Shnayder · Tallinn</p>
   </div>
 </div></footer>

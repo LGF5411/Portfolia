@@ -51,13 +51,13 @@ def page(R, path, title, desc, body, tone="", current=""):
 <link rel="preload" href="{R}assets/fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{R}assets/fonts/newsreader-latin-wght-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{R}assets/css/site.css">
-<script>document.documentElement.classList.add('js')</script>
+<script>(function(d){{d.classList.add('js');var m=null;try{{m=localStorage.getItem('motion')}}catch(e){{}}if(m==='off'||(m!=='on'&&matchMedia('(prefers-reduced-motion: reduce)').matches))d.classList.add('calm')}})(document.documentElement)</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
   <a class="me" href="{R}index.html">Andrii Shnayder</a>
-  <nav aria-label="Main"><a href="{R}index.html#work"{cur('work')}>Work</a><a href="{R}about/index.html"{cur('about')}>About</a>{ext(LINKEDIN, "LinkedIn", "")}</nav>
+  <nav aria-label="Main"><button class="motion motion--top" type="button" data-motion hidden></button><a href="{R}index.html#work"{cur('work')}>Work</a><a href="{R}about/index.html"{cur('about')}>About</a>{ext(LINKEDIN, "LinkedIn", "")}</nav>
 </div></header>
 <main id="main">
 {body}
@@ -70,6 +70,7 @@ def page(R, path, title, desc, body, tone="", current=""):
   </div>
   <div class="legal">
     <p>Bolt and Tallink projects are independent concepts, not affiliated with or endorsed by those companies.</p>
+    <p><button class="motion" type="button" data-motion></button></p>
     <p>© 2026 Andrii Shnayder · Tallinn</p>
   </div>
 </div></footer>

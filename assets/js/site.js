@@ -1,12 +1,25 @@
 /* Portfolio behaviour. Everything here is an extra: with JS off the pages read the same, just still. */
 (function () {
   var root = document.documentElement;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* calm = the system asks for less motion, or the visitor switched it off (set in <head>, before paint) */
+  var reduce = root.classList.contains('calm');
+  var osReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 0. Motion switch: footer always; header only when the system setting silenced the page. */
+  [].forEach.call(document.querySelectorAll('[data-motion]'), function (b) {
+    var top = b.classList.contains('motion--top');
+    b.textContent = reduce ? (top ? 'Turn motion on' : 'Motion is off. Turn on') : 'Motion is on. Turn off';
+    if (top) b.hidden = !(reduce && osReduce);
+    b.addEventListener('click', function () {
+      try { localStorage.setItem('motion', reduce ? 'on' : 'off'); } catch (e) {}
+      location.reload();
+    });
+  });
 
   /* 1. Reveal on scroll. Low threshold + a failsafe, so nothing can stay hidden on a tall desktop screen. */
   var items = [].slice.call(document.querySelectorAll('[data-r]'));
   function show(el) { el.classList.add('in'); }
-  if (reduce || !('IntersectionObserver' in window)) {
+  if (!('IntersectionObserver' in window)) {
     items.forEach(show);
   } else {
     var io = new IntersectionObserver(function (entries) {
@@ -37,7 +50,8 @@
     }, { threshold: 0.25 });
     vids.forEach(function (v) { v.muted = true; vio.observe(v); });
   } else if (reduce) {
-    vids.forEach(function (v) { v.removeAttribute('autoplay'); v.controls = true; });
+    /* calm: nothing plays by itself; case-page videos get controls, home videos stay as stills inside their links */
+    vids.forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); v.controls = !v.closest('a'); });
   }
 
   /* 3. The page takes the light of the project in view. */

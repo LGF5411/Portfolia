@@ -226,14 +226,17 @@ ul,ol{padding:0;list-style:none}
   .facts div{grid-template-columns:22px 84px 1fr}
   .frame{border-radius:7px}
 }
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  :root{transition:none}
-  .js [data-r]{opacity:1;transform:none;transition:none}
-  .hero .stage .wide,.hero .stage .phone{transform:none;animation:none}
-  @view-transition{navigation:none}
-}
-
-/* case hero never grows taller than the screen */
-.case-hero>.frame.wide,.case-hero>.duo{max-width:calc((100svh - 150px)*1.6);margin-left:auto}
-@media (max-width:1100px){.case-hero>.frame.wide,.case-hero>.duo{max-width:none}}
+/* Calm mode: the system asks for less motion (or the visitor switched motion off).
+   Nothing slides, floats or autoplays; soft fades and the change of light stay, because they do not move. */
+.calm{scroll-behavior:auto}
+.calm.js [data-r],.calm.js [data-r="media"]{transform:none;transition:opacity 1s var(--ease);transition-delay:calc(var(--i,0)*90ms)}
+.calm .hero .stage .wide,.calm .hero .stage .phone{transform:none;animation:none}
+.calm .cursor{display:none}
+.motion{appearance:none;background:none;border:0;padding:6px 0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em}
+.motion:hover{color:var(--ink);text-decoration-color:var(--accent)}
+.motion::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.calm .motion::before{background:none;box-shadow:inset 0 0 0 1.5px var(--muted)}
+.motion--top{font-size:15px;color:var(--muted)}
+.motion[hidden]{display:none}
+@media (max-width:700px){.motion--top{display:none}}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
