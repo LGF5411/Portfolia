@@ -176,7 +176,7 @@ def build_home():
   <div class="say">
     <p class="kicker" data-r>{ico('pin')}Product designer · Tallinn</p>
     <h1 data-r style="--i:1">I start with the question a person actually has, and design until the product answers it.</h1>
-    <p class="lead" data-r style="--i:2">Seven projects, each named after its question: a voice app my friends and I talk in, ride-hailing pages, a ferry campaign, my own banner studio, a cosmetics store, a gaming-PC shop and a repair service. I design in Figma and build with AI tools, so an idea gets tested as a working thing, not as a slide.</p>
+    <p class="lead" data-r style="--i:2">Seven projects, each named after the question it answers. I design in Figma and build with AI tools, so an idea gets tested as a working thing, not as a slide.</p>
     <div class="links" data-r style="--i:3"><a class="go fill" href="#work">See the work{ico('arrow')}</a><a class="go" href="about/index.html">About me</a></div>
     <p class="facts-line" data-r style="--i:4"><span><i class="dot"></i>Available now</span><span>{ico('globe')}Estonian, English, Ukrainian, Russian</span></p>
   </div>
@@ -221,8 +221,35 @@ def nums(items):
 def fig(inner, cap, cls="full"):
     return f'<figure class="{cls}" data-r="media">{inner}<figcaption>{cap}</figcaption></figure>' if cls else f'<figure data-r="media">{inner}<figcaption>{cap}</figcaption></figure>'
 
+LEADS = {
+ 'lobby': 'A voice app for playing with friends: everyone hears the same music, and it steps back the moment someone speaks.',
+ 'bolt': 'Every question a first-time visitor brings to bolt.eu ends in the same QR code. I redesigned four pages in Bolt’s own style so that each one answers first.',
+ 'tallink': 'A Christmas campaign concept for Tallink. December is noise, and a ferry is the one place where it cannot reach you for a day.',
+ 'pilk': 'A small banner studio I am starting in Tallinn. Its site has to prove in one scroll that one idea survives every ad size.',
+ 'cosmetics': 'A redesign concept for a store with a very large range: it asks the buyer’s question first and sorts the shelf by the answer.',
+ 'manguarvutid': 'A redesign concept for a gaming-PC shop in Tallinn: say what you play, and the shop does the comparing.',
+ 'restart': 'A laptop repair service designed for a UX course. The real task was removing the fear of an open-ended bill.',
+}
+BRIEF = {
+ 'lobby': ('Voice lived in one app and music in another.', 'One room for both. Music steps back under speech, and one key silences everything.', 'Version 0.14, in testing with friends.'),
+ 'bolt': ('On eight pages, every rider button opens one QR dialog that knows nothing about you.', 'A fare range for your own route and a map of what is near, in Bolt’s own style.', 'Audit and coded prototype. Not tested with visitors.'),
+ 'tallink': ('A Christmas offer has to be noticed in the loudest month of the year.', 'One image, the pause sign on the water, carried across web, film, banners and print.', 'Unofficial concept. Prices and dates are samples.'),
+ 'pilk': ('One banner is never one: every platform asks for its own size.', 'The first screen shows one idea turning into 26 sizes, with your own headline in it.', 'Live and taking first requests. No paying clients yet.'),
+ 'cosmetics': ('Two hundred similar jars, sorted by product line.', 'Scrubs are chosen by scent, hair care by hair type, and you can buy from the first screen.', 'Working Shopify theme. Not tested with shoppers.'),
+ 'manguarvutid': ('Buyers know their game. The catalogue answers in part numbers.', 'Four choices, then the cheapest PC that manages it comes first.', 'Working theme with sample data. Not tested with buyers.'),
+ 'restart': ('Nobody can price a repair before seeing the laptop.', 'Promise the one honest number: diagnostics cost 20 €.', 'Study project. The service is invented.'),
+}
+
 def case(slug, title_extra, facts, links, hero, sections, desc):
     R = '../../'; p = BY[slug]
+    title_extra = LEADS.get(slug, title_extra)
+    facts = [x for x in facts if x[1] != 'Role']
+    facts = [(i, 'Role' if k == 'Who did what' else k, v) for i, k, v in facts]
+    b = BRIEF.get(slug)
+    brief = '' if not b else ('<div class="wrap"><dl class="brief" data-r>'
+        + f'<div>{ico("chat")}<dt>Problem</dt><dd>{b[0]}</dd></div>'
+        + f'<div>{ico("check")}<dt>What I did</dt><dd>{b[1]}</dd></div>'
+        + f'<div>{ico("pulse")}<dt>Where it stands</dt><dd>{b[2]}</dd></div></dl></div>')
     f = ''.join(f'<div>{ico(i)}<dt>{k}</dt><dd>{v}</dd></div>' for i, k, v in facts)
     order = [x['slug'] for x in ALL]; nx = BY[order[(order.index(slug) + 1) % len(order)]]
     body = f'''
@@ -237,6 +264,7 @@ def case(slug, title_extra, facts, links, hero, sections, desc):
   <div class="side" data-r style="--i:2"><dl class="facts">{f}</dl></div>
 </header>
 <div class="wrap case-hero" data-r="media">{hero}</div>
+{brief}
 {''.join(sections)}
 <nav class="next" aria-label="Next project"><div class="wrap"><a href="{R}work/{nx['slug']}/index.html" data-r>
   <span class="kicker">Next · {nx['n']} {nx['name']}{ico('arrow')}</span><span class="q">{nx['q']}</span></a></div></nav>
@@ -257,8 +285,7 @@ def build_cases():
       vid(R, 'lobby/call', alt='Lobby call screen: four friends as pixel beetles in a night forest, a track playing in the header, call chat below'),
       [
        sec('01','The question', body_('Voice in one app, music in another.',
-         'My friends and I play in the evenings from Ukraine, the Baltics and Finland. We talked in one program and each of us kept music in a different one. Nobody heard the same track, and when the music was loud, it fought with the voices.',
-         'I wanted one room where the call and the music belong together: put a track on for everyone, keep talking over it, and silence everything with one key when the round gets serious.')),
+         'My friends and I play in the evenings from Ukraine, the Baltics and Finland. We talked in one program and each of us kept music in a different one. Nobody heard the same track, and when the music was loud, it fought with the voices.',)),
        sec('02','What I decided', steps([
          ('Music is synced, not streamed', 'Each person’s app plays the track itself. Lobby only sends “which track, which second, playing or paused”. No extra lag, nothing is rebroadcast, and when someone speaks, the music fades down by itself.'),
          ('Clutch: one key, fifteen seconds of silence', 'In the decisive moment of a round one press mutes the music for everybody. It comes back on its own, so nobody has to remember to turn it on again.'),
@@ -279,8 +306,7 @@ def build_cases():
          ('globe','7','interface languages: English, Estonian, Ukrainian, Russian, Polish, Latvian, Lithuanian'),
        ]) + '<p class="note" data-r>These are facts about the build, not about users. Lobby is tested by a small group of friends, and I have no usage statistics worth showing yet.</p>'),
        sec('05','What I learned', body_('A product is mostly decisions nobody sees.',
-         'When voice over WebRTC started to stutter, I had the delay measured and moved to our own engine and relay. When the build drifted from my drawings, I sent it back until it matched. Most of my time went into choices like these, not into screens.',
-         'I do not expect Lobby to become popular. I built it to go through the whole cycle once: idea, design, release, security review, feedback from real people, next version.')),
+         'When voice over WebRTC started to stutter, I had the delay measured and moved to our own engine and relay. When the build drifted from my drawings, I sent it back until it matched. Most of my time went into choices like these, not into screens.',)),
       ],
       'Lobby: a voice app for playing with friends, with shared music that steps back when someone speaks. Product and UX case by Andrii Shnayder.')
 
@@ -332,8 +358,7 @@ def build_cases():
       '<div class="duo">' + img(R, 'tallink/landing', 'Landing page: a ferry at night, its lights reflected on the water as two bars, and one button below the headline: choose your pause', w=1440, h=900) + '<div class="frame phone" data-par="46"><video controls playsinline preload="none" poster="' + R + 'assets/work/tallink/paus-916.jpg" aria-label="The 15-second campaign film, with sound"><source src="' + R + 'assets/work/tallink/paus-916.mp4" type="video/mp4"></video></div></div>',
       [
        sec('01','The idea', body_('The pause sign was already on the water.',
-         'A ferry at night throws two tall reflections of light onto the sea. Side by side they read as a pause sign. That one image carries the campaign: the headline, the button (“Vali oma paus”, choose your pause) and the cut in the film all use it.',
-         'The offer is sorted by how long a pause you can afford: a day trip to Helsinki, a cruise to Stockholm, or a cruise with a hotel night.')),
+         'A ferry at night throws two tall reflections of light onto the sea. Side by side they read as a pause sign. That one image carries the campaign: the headline, the button (“Vali oma paus”, choose your pause) and the cut in the film all use it.',)),
        sec('02','One idea, every format',
          '<div class="trio">' +
          fig(img(R,'tallink/banner-45','Banner 4:5 in Estonian', 'p45', w=1080, h=1350), '<b>Social 4:5.</b> One of seven banner formats, each in Estonian and English.', '') +
@@ -363,8 +388,7 @@ def build_cases():
       '<div class="duo">' + vid(R, 'pilk/morph', alt='Pilk home page: while the page scrolls, one banner changes shape from a medium rectangle to a leaderboard, a square post, a story and a billboard, then spreads into all 26 sizes') + img(R, 'pilk/m', 'The same page on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>',
       [
        sec('01','The question', body_('One banner is never one banner.',
-         'A café makes a nice square post. Then Google wants a 728 × 90 strip, Instagram wants a story, and the printer wants a poster. The same picture gets squeezed, the headline stops fitting, the button disappears.',
-         'So the question a buyer really has is not “can you design a banner?” but “will it still read when it is a thin strip on a phone?”. The site answers that before it says anything about the studio.')),
+         'A café makes a nice square post. Then Google wants a 728 × 90 strip, Instagram wants a story, and the printer wants a poster. The same picture gets squeezed, the headline stops fitting, the button disappears.',)),
        sec('02','What I decided', steps([
          ('The first screen is the product working', 'Scroll, and one banner turns into a leaderboard, a square, a story, a billboard, and then lays out all 26 sizes. No claim about quality, just the thing happening.'),
          ('Your words, immediately', 'A field under the banner says “Your headline”. Type your own offer and every size on the page shows it.'),
@@ -380,8 +404,7 @@ def build_cases():
          fig(img(R,'pilk/demo','An example site for a lunch café, marked as an example design by Pilk'), '<b>Example site.</b> A full sample for an invented café, labelled as an example at the bottom of every page.', '') +
          '</div>'),
        sec('04','What is real and what is not', body_('It is a business on day one, and the page says so.',
-         'The site is live in English, Estonian and Russian. The offer, the prices and the free test are real. There are no client cases yet, the example businesses are made up and labelled, and the Estonian text is still waiting for a careful read.',
-         'What I am learning here is not layout. It is what a stranger needs to see before they send money to someone they have never heard of.')),
+         'The site is live in English, Estonian and Russian. The offer, the prices and the free test are real. There are no client cases yet, the example businesses are made up and labelled, and the Estonian text is still waiting for a careful read.',)),
       ],
       'Pilk: a small banner studio in Tallinn whose home page shows one idea surviving 26 sizes. Case by Andrii Shnayder.')
 
@@ -432,7 +455,6 @@ def build_cases():
       [
        sec('01','The question', body_('Stores are sorted by product line. People arrive with a wish.',
          'Nobody walks in looking for “the Fig &amp; Rosehip line”. They want a scrub that smells of mango, or a shampoo for oily hair. The catalogue knows the answer, but the visitor has to translate the wish into the store’s language first.',
-         'So the first screen of each shelf does the translating.',
          '<p class="small">This is a view from outside. The brand knows what I cannot: what sells, what is returned, what its buyers search for. I would begin with that data and with what already works on the live site.</p>')),
        sec('02','The shelf', body_('“Pick your flavour.” Scrubs are bought by scent, shampoo by hair type.',
          'Organic Shop makes natural cosmetics in Tallinn. Its best-known product is a body scrub that comes in a couple of dozen flavours, and nobody compares scrubs by formula. So the scrub shelf switches by scent, and the page takes the colour of the jar.',
@@ -484,8 +506,7 @@ def build_cases():
          fig(img(R,'manguarvutid/pdp','Product page: name, key specifications, price and Add to cart'), '<b>Product page.</b> Parts with concrete numbers, then the price and one button.') +
          fig(img(R,'manguarvutid/conf','Configurator: step 1 of 8, choosing a processor'), '<b>Configurator.</b> Eight steps, with a recommendation and a reason at each.')),
        sec('04','Where the map stops', body_('A sky works for a few dozen PCs. It would not work for hundreds of monitors.',
-         'The map needs one axis everybody understands, and gaming PCs have it: frames per second. Accessories do not. So that part of the store is an ordinary list with filters by the properties people actually compare, a sort order and a count, and each row says which PC it suits.',
-         'The cart keeps the answers to the last doubts next to the checkout button: delivery, how to pay, returns.')
+         'The map needs one axis everybody understands, and gaming PCs have it: frames per second. Accessories do not. So that part of the store is an ordinary list with filters by the properties people actually compare, a sort order and a count, and each row says which PC it suits.',)
          + fig(img(R,'manguarvutid/filters','Monitors as a filtered list: size, resolution, refresh rate, panel, brand, price; each row names the PC it suits'), '<b>Monitors.</b> Six filters, sorting, and a “suits” line under each product instead of a second comparison.') +
          fig(img(R,'manguarvutid/cart','Cart with one PC, the total with VAT, and delivery, payment and returns beside the checkout button'), '<b>Cart.</b> Total with VAT, the monthly instalment, then delivery, payment and returns in three lines.')),
        sec('05','How I would know it works', steps([
@@ -495,8 +516,7 @@ def build_cases():
          ('What would make me drop it', 'If people skip the picker and scroll straight to the list, the list becomes the first screen and the picker a filter on top of it.'),
        ])),
        sec('06','What is real and what is not', body_('A concept with sample data should say so on every page.',
-         'A strip at the top of the store reads “Disainikontseptsioon”: some prices and builds are samples and frame rates come from a model, not from benchmarks I ran. Product photos are marked as illustrative. Before this could go live, every number would have to come from the shop.',
-         'It also exists in a light theme, because a dark page full of stars is a choice, not a requirement.')),
+         'A strip at the top of the store reads “Disainikontseptsioon”: some prices and builds are samples and frame rates come from a model, not from benchmarks I ran. Product photos are marked as illustrative. Before this could go live, every number would have to come from the shop.',)),
       ],
       'Tähekaart: an unofficial redesign concept for Mänguarvutid.ee where the buyer picks a game and a frame rate instead of a graphics card. Case by Andrii Shnayder.')
 
@@ -512,8 +532,7 @@ def build_cases():
       '<div class="duo">' + img(R, 'restart/hero', 'Restart home page: “If your laptop is broken, we can help you”, one button to book diagnostics, and a line with the price below it', w=1440, h=900) + img(R, 'restart/m', 'The same page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>',
       [
        sec('01','The question', body_('You do not know what is broken, so nobody can tell you the price.',
-         'A person with a dead laptop cannot describe the fault and expects to be overcharged. Most repair sites answer with a price list of thirty services, which only helps if you already know which one you need.',
-         'I started from what the service can honestly promise before it has seen the machine. It is exactly one thing: what the diagnosis costs.')),
+         'A person with a dead laptop cannot describe the fault and expects to be overcharged. Most repair sites answer with a price list of thirty services, which only helps if you already know which one you need.',)),
        sec('02','What I decided', steps([
          ('One number on the page', 'Diagnostics cost 20 €. If you go ahead with the repair, it is included. If you decline, that is all you pay.'),
          ('“Describe what you noticed” is enough to start', 'The second sentence on the page says it: you do not have to know what is wrong. Say what you see, in your own words.'),

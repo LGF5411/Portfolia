@@ -279,3 +279,11 @@ ul,ol{padding:0;list-style:none}
 :root[data-tone="pilk"]{--bg:#FBEFFA;--ink:#2B1030;--muted:#6F5A73;--line:#EBD6EA;--accent:#7A1C7E}
 .frame.fl{aspect-ratio:1440/790}.frame.pd{aspect-ratio:1440/1340}
 .mcard .frame{aspect-ratio:16/10}
+/* v3.5: the case in three lines */
+.brief{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px clamp(24px,3.4vw,64px);margin:clamp(28px,4.5vh,52px) 0 0;padding-top:clamp(20px,3vh,30px);border-top:1px solid var(--line)}
+.brief div{display:grid;grid-template-columns:22px 1fr;column-gap:12px;row-gap:6px;align-items:start}
+.brief .ico{color:var(--accent);margin-top:2px}
+.brief dt{font-size:14px;color:var(--muted);letter-spacing:.01em}
+.brief dd{grid-column:2;margin:0;font-size:clamp(17px,1.25vw,20px);line-height:1.38;max-width:26em}
+@media (max-width:860px){.brief{grid-template-columns:1fr}}
+.brief{padding-bottom:clamp(8px,2vh,20px)}
