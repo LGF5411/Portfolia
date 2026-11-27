@@ -126,74 +126,101 @@ BY = {p['slug']: p for p in ALL}
 def home_media(R, p):
     s = p['slug']
     if s == 'lobby':
-        inner = vid(R, 'lobby/call', alt='Lobby call screen: four friends in a pixel forest at night, a track playing in the header')
+        inner = img(R, 'lobby/day', 'Lobby call screen by day: friends in a pixel forest, a track playing in the header', w=1920, h=1200)
     elif s == 'bolt':
         inner = '<div class="duo">' + vid(R, 'bolt/rides', alt='Bolt Rides page concept: a fare range for the visitor’s own route') + vid(R, 'bolt/phone', 'phone', ' data-par="46"', 'The same concept on a phone') + '</div>'
     elif s == 'tallink':
         inner = '<div class="duo">' + img(R, 'tallink/landing', 'Campaign landing page: a ferry at night whose lights reflect on the sea as a pause sign', w=1440, h=900) + vid(R, 'tallink/paus-916', 'phone', ' data-par="46"', 'The 15-second campaign film in vertical format') + '</div>'
     elif s == 'cosmetics':
-        return img(R, 'cosmetics/os-flavour', 'Organic Shop concept: “Pick your flavour”, six scrub scents as the menu', 'fl', w=1440, h=790)
+        inner = '<div class="duo">' + img(R, 'cosmetics/os-home', 'Organic Shop concept: home page with a seasonal scrub banner', w=1440, h=900) + img(R, 'cosmetics/os-pdp-m', 'The product page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>'
     elif s == 'manguarvutid':
-        return vid(R, 'manguarvutid/picker', alt='Mänguarvutid concept: choosing games, resolution and frame rate changes the recommended PC')
+        inner = '<div class="duo">' + vid(R, 'manguarvutid/picker', alt='Mänguarvutid concept: choosing games, resolution and frame rate changes the recommended PC') + img(R, 'manguarvutid/m', 'The picker on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>'
     elif s == 'restart':
-        return img(R, 'restart/hero', 'Restart: “If your laptop is broken, we can help you”, with one button to book diagnostics', w=1440, h=900)
+        inner = img(R, 'restart/hero', 'Restart: “If your laptop is broken, we can help you”, with one button to book diagnostics', w=1440, h=900)
     elif s == 'pilk':
         inner = '<div class="duo">' + vid(R, 'pilk/morph', alt='Pilk home page: one banner changes shape through six formats as the page scrolls, then spreads into all 26 sizes') + img(R, 'pilk/m', 'The same page on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>'
     else:
         inner = '<div class="duo left">' + img(R, 'minu-vahetus/manager-d', 'Manager view: who has seen the schedule, pending requests, sick notes') + vid(R, 'minu-vahetus/flow', 'phone', ' data-par="46"', 'Worker view on a phone: confirming the week and asking for a day off') + '</div>'
     return f'<a class="media" href="{R}work/{s}/index.html" data-cursor="Open case" data-r="media" aria-label="Open the {p["name"]} case">{inner}</a>'
 
-def build_home():
-    R = ''
-    idx = ''.join(f'<li><a href="#{p["slug"]}"><span class="n">{p["n"]} · {p["name"]}</span><span class="t">{p["q"]}</span></a></li>' for p in ALL)
-    more = ''
-    for i, p in enumerate(P2):
-        ic, t = p['meta'][0]
-        more += f'''<a class="mcard" id="{p['slug']}" href="work/{p['slug']}/index.html" data-cursor="Open case" data-r style="--i:{i}">
-  {home_media(R, p)}
-  <span class="kicker"><i>{p['n']}</i><b>{p['name']}</b></span>
-  <span class="q">{p['q']}</span>
-  <span class="a">{p['a']}</span>
-  <span class="m">{ico(ic)}{t}</span>
-</a>'''
+HOME = {
+ 'lobby': ('voice app', 'Voice chat where friends hear the same music', 'The idea, the call and music scenarios, the UI canvases, every product decision. Code written with Claude.', 'Version 0.14, in testing with friends.'),
+ 'bolt': ('website concept', 'Website concept: see the price of a ride before installing the app', 'The audit of eight pages, the concept, direction and sign-off of the prototype. Code written with Claude.', 'Independent concept. Not tested with users.'),
+ 'tallink': ('campaign', 'Christmas campaign concept: landing page, film, banners, print', 'The idea, the choices, final copy in Estonian and English. Production with Claude.', 'Independent concept. Prices and dates are samples.'),
+ 'pilk': ('banner studio', 'My own banner studio: one idea delivered in 26 sizes', 'The business, the offer, the prices, sign-off on every page. Design and code with Claude.', 'Live, taking first requests.'),
+ 'cosmetics': ('online store', 'Online store redesign: choose by scent or by hair type', 'The review of the live site, the concept, sign-off on every screen. Theme code with Claude.', 'Working theme. Independent concept, not tested.'),
+ 'manguarvutid': ('gaming-PC store', 'Gaming-PC store redesign: pick a game, get a PC', 'The first-screen sketch and the decisions. Theme code with Claude.', 'Working theme with sample data. Not tested.'),
+ 'restart': ('repair service', 'Laptop repair service: booking built around one price', 'The flow and the Figma design, by hand. Built as a site with Claude.', 'Study project.'),
+}
+CARD = {
+ 'lobby': ('v', 'lobby/call', 'Lobby call screen: four friends in a pixel forest at night'),
+ 'bolt': ('v', 'bolt/rides', 'Bolt Rides page concept: a fare range for the visitor’s own route'),
+ 'tallink': ('i', 'tallink/landing', 'Campaign landing page: a ferry at night whose lights read as a pause sign'),
+ 'pilk': ('v', 'pilk/morph', 'Pilk home page: one banner changes shape through six formats'),
+ 'cosmetics': ('i', 'cosmetics/os-home', 'Organic Shop concept: home page with a seasonal scrub banner'),
+ 'manguarvutid': ('v', 'manguarvutid/picker', 'Gaming-PC store concept: choosing a game changes the recommended PC'),
+ 'restart': ('i', 'restart/hero', 'Restart: one button to book diagnostics'),
+}
+TITLE = {'bolt': 'Bolt', 'tallink': 'Tallink', 'manguarvutid': 'Mänguarvutid.ee'}
+VARIANTS = {
+ '': dict(key=['lobby', 'bolt'], rest=['tallink', 'pilk', 'cosmetics', 'manguarvutid', 'restart'], cap='On screen: Lobby, a voice app (video), and the bolt.eu concept (phone).'),
+ 'shop': dict(key=['manguarvutid', 'cosmetics'], rest=['lobby', 'bolt', 'pilk', 'tallink', 'restart'], cap='On screen: a gaming-PC store concept (video) and an Organic Shop product page (phone).'),
+ 'beauty': dict(key=['cosmetics', 'tallink'], rest=['manguarvutid', 'pilk', 'lobby', 'bolt', 'restart'], cap='On screen: the Organic Shop concept, home page and product page.'),
+}
+
+def card_media(R, slug):
+    k, src, alt = CARD[slug]
+    return vid(R, src, alt=alt) if k == 'v' else img(R, src, alt, w=1440, h=900)
+
+def hero_stage(R, variant):
+    a = lambda slug, inner: f'<a href="{R}work/{slug}/index.html" data-cursor="{BY[slug]["name"]}" aria-label="Open the {BY[slug]["name"]} case">{inner}</a>'
+    if variant == 'shop':
+        return a('manguarvutid', card_media(R, 'manguarvutid')) + a('cosmetics', img(R, 'cosmetics/os-pdp-m', 'Organic Shop product page on a phone', 'phone', w=390, h=844))
+    if variant == 'beauty':
+        return a('cosmetics', card_media(R, 'cosmetics')) + a('cosmetics', img(R, 'cosmetics/os-pdp-m', 'The product page on a phone', 'phone', w=390, h=844))
+    return a('lobby', card_media(R, 'lobby')) + a('bolt', vid(R, 'bolt/phone', 'phone', '', 'The bolt.eu concept on a phone'))
+
+def build_home(variant=''):
+    R = '../' if variant else ''
+    V = VARIANTS[variant]
+    order = V['key'] + V['rest']
+    idx = ''.join(f'<li><a href="#{s}"><b>{TITLE.get(s, BY[s]["name"])}</b><span>{HOME[s][0]}</span></a></li>' for s in order)
     rows = ''
-    for p in P:
-        meta = ''.join(f'<li>{ico(i)}<span>{t}</span></li>' for i, t in p['meta'])
+    for n, s in enumerate(V['key']):
+        p = BY[s]; tag, what, part, status = HOME[s]
         rows += f'''
-<section class="proj" id="{p['slug']}" data-tone-zone="{p['tone']}"><div class="wrap">
+<section class="proj" id="{s}" data-tone-zone="{p['tone']}"><div class="wrap">
   <div class="txt">
-    <p class="kicker" data-r><i>{p['n']}</i><b>{p['name']}</b></p>
-    <p class="q" data-r style="--i:1">{p['q']}</p>
-    <h2 class="sr">{p['name']}</h2>
-    <p class="lead" data-r style="--i:2">{p['a']}</p>
-    <ul class="meta" data-r style="--i:3">{meta}</ul>
-    <a class="go" data-r style="--i:4" href="work/{p['slug']}/index.html">Read the case{ico('arrow')}</a>
+    <p class="kicker" data-r><i>Start here</i><b>{n + 1} of 2</b></p>
+    <h2 class="pname" data-r style="--i:1">{TITLE.get(s, p['name'])}</h2>
+    <p class="pwhat" data-r style="--i:1">{what}</p>
+    <dl class="pfacts" data-r style="--i:2"><div>{ico('user')}<dt>My part</dt><dd>{part}</dd></div><div>{ico('pulse')}<dt>Status</dt><dd>{status}</dd></div></dl>
+    <a class="go fill" data-r style="--i:3" href="{R}work/{s}/index.html">Open the case{ico('arrow')}</a>
   </div>
   {home_media(R, p)}
 </div></section>'''
+    more = ''
+    for i, s in enumerate(V['rest']):
+        p = BY[s]; tag, what, part, status = HOME[s]
+        more += f'''<a class="mcard" id="{s}" href="{R}work/{s}/index.html" data-cursor="Open case" data-r style="--i:{i % 3}">
+  {card_media(R, s)}
+  <span class="pn"><b>{TITLE.get(s, p['name'])}</b></span>
+  <span class="a">{what}</span>
+  <span class="m">{ico('user')}<span>{part}</span></span>
+  <span class="m">{ico('pulse')}<span>{status}</span></span>
+</a>'''
     body = f'''
 <section class="wrap hero">
   <div class="say">
-    <p class="kicker" data-r>{ico('pin')}Product designer · Tallinn</p>
-    <h1 data-r style="--i:1">I start with the question a person actually has, and design until the product answers it.</h1>
-    <p class="lead" data-r style="--i:2">Seven projects, each named after the question it answers. I design in Figma and build with AI tools, so an idea gets tested as a working thing, not as a slide.</p>
-    <div class="links" data-r style="--i:3"><a class="go fill" href="#work">See the work{ico('arrow')}</a><a class="go" href="about/index.html">About me</a></div>
+    <p class="kicker" data-r>{ico('pin')}Junior Product Designer · Tallinn</p>
+    <h1 data-r style="--i:1">I design app and website interfaces, and build clickable prototypes with AI.</h1>
+    <p class="lead" data-r style="--i:2">Looking for a junior position or an internship, in Tallinn or remote. Two projects to start with are right below.</p>
+    <div class="links" data-r style="--i:3"><a class="go fill" href="#work">See the two projects{ico('arrow')}</a>{ext(LINKEDIN, "LinkedIn", "go")}<a class="go" href="{R}about/index.html">About me</a></div>
     <p class="facts-line" data-r style="--i:4"><span><i class="dot"></i>Available now</span><span>{ico('globe')}Estonian, English, Ukrainian, Russian</span></p>
   </div>
   <div class="stage" data-r="media" style="--i:2">
-    <div class="rel">
-    <a href="work/lobby/index.html" data-cursor="Lobby" aria-label="Open the Lobby case"><div class="frame wide"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/lobby/call.jpg" aria-label="Lobby call screen: four friends in a pixel forest at night"><source src="assets/work/lobby/call.mp4" type="video/mp4"></video></div></a>
-    <a href="work/bolt/index.html" data-cursor="Bolt" aria-label="Open the Bolt case"><div class="frame phone"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/bolt/phone.jpg" aria-label="The bolt.eu concept on a phone"><source src="assets/work/bolt/phone.mp4" type="video/mp4"></video></div></a>
-    </div>
-    <p class="small cap">Recorded live from working builds: Lobby (01) and the bolt.eu concept (02).</p>
-    <template data-for="ecommerce" data-cap="A working store concept, recorded live: Tähekaart (06).">
-    <a href="work/manguarvutid/index.html" data-cursor="Tähekaart" aria-label="Open the Tähekaart case"><div class="frame wide"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/manguarvutid/picker.jpg" aria-label="Gaming-PC store concept: choosing a game and a frame rate changes the recommended PC"><source src="assets/work/manguarvutid/picker.mp4" type="video/mp4"></video></div></a>
-    <a href="work/manguarvutid/index.html" data-cursor="Tähekaart" aria-label="Open the Tähekaart case"><div class="frame phone"><img src="assets/work/manguarvutid/m.webp" alt="The same picker on a phone" width="780" height="1688"></div></a>
-    </template>
-    <template data-for="beauty" data-cap="A working store concept for Organic Shop (05). Independent, not affiliated with the brand.">
-    <a href="work/cosmetics/index.html" data-cursor="Cosmetics" aria-label="Open the cosmetics case"><div class="frame wide"><img src="assets/work/cosmetics/os-home.webp" alt="Organic Shop concept: home page with a seasonal scrub banner" width="1440" height="900"></div></a>
-    <a href="work/cosmetics/index.html" data-cursor="Cosmetics" aria-label="Open the cosmetics case"><div class="frame phone"><img src="assets/work/cosmetics/os-pdp-m.webp" alt="The product page on a phone" width="390" height="844"></div></a>
-    </template>
+    <div class="rel">{hero_stage(R, variant)}</div>
+    <p class="small cap">{V['cap']}</p>
   </div>
 </section>
 <nav class="index wrap" id="work" aria-label="Projects" data-r><ol>{idx}</ol></nav>
@@ -201,13 +228,13 @@ def build_home():
 <section class="more" data-tone-zone="base"><div class="wrap">
   <div class="head">
     <p class="kicker" data-r>{ico('box')}More work</p>
-    <h2 data-r style="--i:1">Three shorter studies. Different shelves, same habit: find the buyer’s question and put the answer on the first screen.</h2>
+    <h2 data-r style="--i:1">Five more projects, in the same format: what it is, my part, where it stands.</h2>
   </div>
   <div class="mgrid">{more}</div>
 </div></section>
 '''
-    page(R, 'index.html', 'Andrii Shnayder · product designer, Tallinn',
-         'Product designer in Tallinn. Seven projects, each named after the question it answers: a voice app, a bolt.eu concept, a Tallink campaign, a banner studio, a cosmetics store, a gaming-PC shop and a repair service.', body, current='work')
+    page(R, (variant + '/' if variant else '') + 'index.html', 'Andrii Shnayder · junior product designer, Tallinn',
+         'Junior product designer in Tallinn. I design app and website interfaces and build clickable prototypes with AI. Start with two projects: Lobby, a voice app, and a bolt.eu concept.', body, current='work')
 
 # ------------------------------------------------------------------ case pages
 def sec(n, label, inner):
@@ -318,7 +345,7 @@ def build_cases():
        ('tool','Built with','Figma (tokens, components, handoff), HTML, CSS, JavaScript, OpenStreetMap data. AI: Claude, Higgsfield'),
        ('flag','Status','Independent concept, not affiliated with Bolt'),
        ('chat','Who did what','Me: the audit, the decisions, direction and sign-off on every page. Claude: the prototype code')],
-      ext('https://lgf5411.github.io/bolt-web-concept/', 'Read the full case study', 'go fill') + ext('https://lgf5411.github.io/bolt-web-concept/prototype/', 'Open the prototype'),
+      ext('https://lgf5411.github.io/bolt-web-concept/prototype/', 'Open the prototype', 'go fill'),
       '<div class="duo">' + vid(R, 'bolt/rides', alt='Rides page concept: a fare range for each ride type on the visitor’s own route') + vid(R, 'bolt/phone', 'phone', ' data-par="46"', 'The Car-sharing page on a phone') + '</div>',
       [
        sec('01','The question', body_('A brochure that sends you away to act.',
@@ -342,7 +369,7 @@ def build_cases():
        sec('04','Why it is like this', body_('Most of what looks like a problem has a reason.',
          'Before changing anything I wrote down why bolt.eu probably works the way it does. No fare on the page: prices move with demand, and a wrong number is a legal risk. So the concept shows a labelled range, and markets that cannot show estimates get a static “from” table in the same component.',
          'The full case walks through every finding, the handoff file in Figma and what I cut.',
-         '<p>' + ext('https://lgf5411.github.io/bolt-web-concept/', 'Full case study') + '</p>')),
+         '<p class="small">' + ext('https://lgf5411.github.io/bolt-web-concept/', 'The long version, for those who want every finding') + '</p>')),
       ],
       'Answers before the app: an unofficial redesign concept for bolt.eu where each public page answers the visitor’s question first. Case by Andrii Shnayder.')
 
@@ -596,5 +623,5 @@ def build_404():
     page('/Portfolia/', '404.html', 'Not found · Andrii Shnayder', 'Page not found.', body)
 
 if __name__ == '__main__':
-    build_home(); build_cases(); build_about(); build_404()
+    build_home(); build_home('shop'); build_home('beauty'); build_cases(); build_about(); build_404()
     print('built')

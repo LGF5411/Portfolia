@@ -287,3 +287,24 @@ ul,ol{padding:0;list-style:none}
 .brief dd{grid-column:2;margin:0;font-size:clamp(17px,1.25vw,20px);line-height:1.38;max-width:26em}
 @media (max-width:860px){.brief{grid-template-columns:1fr}}
 .brief{padding-bottom:clamp(8px,2vh,20px)}
+/* v4: role first, two projects, then the rest */
+.hero{min-height:0;padding-block:clamp(36px,6vh,80px) clamp(84px,10vh,120px)}
+.hero h1{font-size:clamp(29px,2.9vw,50px)}
+.index ol{display:flex;flex-wrap:wrap;gap:12px clamp(22px,2.6vw,44px);row-gap:12px}
+.index a{flex-direction:row;align-items:baseline;gap:8px;font-size:15px}
+.index a b{font-weight:600;transition:color .25s}
+.index a span{color:var(--muted);font-size:14px}
+.index a:hover b{color:var(--accent)}
+.proj{padding-block:clamp(64px,10vh,140px)}
+.proj .pname{font:600 clamp(30px,2.6vw,44px)/1.05 var(--sans);letter-spacing:-.025em;margin-top:-6px}
+.proj .pwhat{font:italic 400 clamp(20px,1.6vw,26px)/1.25 var(--serif);letter-spacing:-.01em;margin-top:-10px;max-width:20em}
+.pfacts{display:grid;gap:14px;margin:4px 0 2px}
+.pfacts div{display:grid;grid-template-columns:22px 1fr;column-gap:12px;row-gap:3px;align-items:start}
+.pfacts .ico{color:var(--accent);margin-top:2px}
+.pfacts dt{font-size:13.5px;color:var(--muted)}
+.pfacts dd{grid-column:2;margin:0;font-size:16px;line-height:1.45;max-width:30em}
+.mcard .pn b{font:600 clamp(19px,1.4vw,22px)/1.2 var(--sans);letter-spacing:-.015em;transition:color .25s}
+.mcard:hover .pn b{color:var(--accent)}
+.mcard .a{color:var(--ink);font:italic 400 17.5px/1.3 var(--serif);margin-bottom:4px}
+.mcard .m{align-items:flex-start;line-height:1.4;margin-top:0}
+.mcard .m .ico{margin-top:2px}
