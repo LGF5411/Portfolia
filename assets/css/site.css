@@ -308,3 +308,8 @@ ul,ol{padding:0;list-style:none}
 .mcard .a{color:var(--ink);font:italic 400 17.5px/1.3 var(--serif);margin-bottom:4px}
 .mcard .m{align-items:flex-start;line-height:1.4;margin-top:0}
 .mcard .m .ico{margin-top:2px}
+/* v4.1: text and buttons are there the moment you look; only media fades in */
+.js [data-r]:not([data-r="media"]),.calm.js [data-r]:not([data-r="media"]){opacity:1;transform:none;transition:none}
+.js [data-r="media"]{transition-duration:.5s;transition-delay:0s}
+.proj{padding-block:clamp(48px,7vh,100px)}
+.hero h1{font-size:clamp(26px,2.45vw,42px);line-height:1.14}

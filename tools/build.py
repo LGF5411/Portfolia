@@ -1,10 +1,11 @@
+import re
 #!/usr/bin/env python3
 """Builds the static pages of the portfolio. Run from the site root:  python3 tools/build.py
 Texts live in this file; the output is plain HTML that can also be edited by hand."""
 import os, html
 
 LINKEDIN = "https://www.linkedin.com/in/andrii-shnayder-a15bb8440/"
-EMAIL = ""   # put the address here and rebuild; while empty, no e-mail is shown anywhere
+EMAIL = "andruve09s@gmail.com"   # put the address here and rebuild; while empty, no e-mail is shown anywhere
 
 ICONS = {
  'arrow':'<path d="M5 12h14M13 6l6 6-6 6"/>', 'back':'<path d="M19 12H5M11 6l-6 6 6 6"/>',
@@ -66,7 +67,7 @@ def page(R, path, title, desc, body, tone="", current=""):
   <div class="say">
     <p class="q">Have a question your product should answer better?</p>
     <p class="lead">I am looking for a junior product designer (UX/UI) role or an internship. In Tallinn or remote, available now.</p>
-    <div class="links">{ext(LINKEDIN, ico("in") + "Write to me on LinkedIn", "go fill")}{mail}</div>
+    <div class="links">{ext(LINKEDIN, ico("in") + "Write to me on LinkedIn", "go fill")}{mail}<a class="go" href="{R}cv.pdf">CV (PDF)</a></div>
   </div>
   <div class="legal">
     <p>The Bolt, Tallink, Organic Shop and Mänguarvutid.ee projects are independent concepts, not affiliated with or endorsed by those companies.</p>
@@ -102,7 +103,7 @@ P = [
 ]
 P2 = [
  dict(slug='cosmetics', tone='cosmetics', n='05', name='Organic Shop', kind='Online store redesign · unofficial concept',
-      q='“Which one is for me?”',
+      q='“Which of two hundred jars is mine?”',
       a='A cosmetics store with a very large range, where the shelf asks the buyer’s question first: scrubs by scent, hair care by hair type.',
       meta=[('box','E-commerce · working Shopify theme')]),
  dict(slug='manguarvutid', tone='mangu', n='06', name='Tähekaart', kind='Mänguarvutid.ee redesign · unofficial concept',
@@ -132,7 +133,7 @@ def home_media(R, p):
     elif s == 'tallink':
         inner = '<div class="duo">' + img(R, 'tallink/landing', 'Campaign landing page: a ferry at night whose lights reflect on the sea as a pause sign', w=1440, h=900) + vid(R, 'tallink/paus-916', 'phone', ' data-par="46"', 'The 15-second campaign film in vertical format') + '</div>'
     elif s == 'cosmetics':
-        inner = '<div class="duo">' + img(R, 'cosmetics/os-home', 'Organic Shop concept: home page with a seasonal scrub banner', w=1440, h=900) + img(R, 'cosmetics/os-pdp-m', 'The product page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>'
+        inner = '<div class="duo">' + img(R, 'cosmetics/os-flavour-card', 'Organic Shop concept: “Pick your flavour”, six scrub scents as the menu', w=1440, h=900) + img(R, 'cosmetics/os-pdp-m', 'The product page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>'
     elif s == 'manguarvutid':
         inner = '<div class="duo">' + vid(R, 'manguarvutid/picker', alt='Mänguarvutid concept: choosing games, resolution and frame rate changes the recommended PC') + img(R, 'manguarvutid/m', 'The picker on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>'
     elif s == 'restart':
@@ -157,7 +158,7 @@ CARD = {
  'bolt': ('v', 'bolt/rides', 'Bolt Rides page concept: a fare range for the visitor’s own route'),
  'tallink': ('i', 'tallink/landing', 'Campaign landing page: a ferry at night whose lights read as a pause sign'),
  'pilk': ('v', 'pilk/morph', 'Pilk home page: one banner changes shape through six formats'),
- 'cosmetics': ('i', 'cosmetics/os-home', 'Organic Shop concept: home page with a seasonal scrub banner'),
+ 'cosmetics': ('i', 'cosmetics/os-flavour-card', 'Organic Shop concept: “Pick your flavour”, six scrub scents as the menu, with Add to bag'),
  'manguarvutid': ('v', 'manguarvutid/picker', 'Gaming-PC store concept: choosing a game changes the recommended PC'),
  'restart': ('i', 'restart/hero', 'Restart: one button to book diagnostics'),
 }
@@ -165,7 +166,7 @@ TITLE = {'bolt': 'Bolt', 'tallink': 'Tallink', 'manguarvutid': 'Mänguarvutid.ee
 VARIANTS = {
  '': dict(key=['lobby', 'bolt'], rest=['tallink', 'pilk', 'cosmetics', 'manguarvutid', 'restart'], cap='On screen: Lobby, a voice app (video), and the bolt.eu concept (phone).'),
  'shop': dict(key=['manguarvutid', 'cosmetics'], rest=['lobby', 'bolt', 'pilk', 'tallink', 'restart'], cap='On screen: a gaming-PC store concept (video) and an Organic Shop product page (phone).'),
- 'beauty': dict(key=['cosmetics', 'tallink'], rest=['manguarvutid', 'pilk', 'lobby', 'bolt', 'restart'], cap='On screen: the Organic Shop concept, home page and product page.'),
+ 'beauty': dict(key=['cosmetics', 'tallink'], rest=['manguarvutid', 'pilk', 'lobby', 'bolt', 'restart'], cap='On screen: the Organic Shop concept, choosing a scrub by scent, and the product page.'),
 }
 
 def card_media(R, slug):
@@ -187,7 +188,7 @@ def build_home(variant=''):
     idx = ''.join(f'<li><a href="#{s}"><b>{TITLE.get(s, BY[s]["name"])}</b><span>{HOME[s][0]}</span></a></li>' for s in order)
     rows = ''
     for n, s in enumerate(V['key']):
-        p = BY[s]; tag, what, part, status = HOME[s]
+        p = BY[s]; tag, what, part, status = HOME[s]; part = ROLE[s][0]
         rows += f'''
 <section class="proj" id="{s}" data-tone-zone="{p['tone']}"><div class="wrap">
   <div class="txt">
@@ -201,7 +202,7 @@ def build_home(variant=''):
 </div></section>'''
     more = ''
     for i, s in enumerate(V['rest']):
-        p = BY[s]; tag, what, part, status = HOME[s]
+        p = BY[s]; tag, what, part, status = HOME[s]; part = ROLE[s][0]
         more += f'''<a class="mcard" id="{s}" href="{R}work/{s}/index.html" data-cursor="Open case" data-r style="--i:{i % 3}">
   {card_media(R, s)}
   <span class="pn"><b>{TITLE.get(s, p['name'])}</b></span>
@@ -213,9 +214,9 @@ def build_home(variant=''):
 <section class="wrap hero">
   <div class="say">
     <p class="kicker" data-r>{ico('pin')}Junior Product Designer · Tallinn</p>
-    <h1 data-r style="--i:1">I design app and website interfaces, and build clickable prototypes with AI.</h1>
+    <h1 data-r style="--i:1">I designed Lobby, a voice app my friends and I talk in. I design interfaces for apps and websites and test them as working prototypes.</h1>
     <p class="lead" data-r style="--i:2">Looking for a junior position or an internship, in Tallinn or remote. Two projects to start with are right below.</p>
-    <div class="links" data-r style="--i:3"><a class="go fill" href="#work">See the two projects{ico('arrow')}</a>{ext(LINKEDIN, "LinkedIn", "go")}<a class="go" href="{R}about/index.html">About me</a></div>
+    <div class="links" data-r style="--i:3"><a class="go fill" href="#work">See the two projects{ico('arrow')}</a>{ext(LINKEDIN, "LinkedIn", "go")}<a class="go" href="mailto:{EMAIL}">Email</a><a class="go" href="{R}cv.pdf">CV{ico('arrow')}</a></div>
     <p class="facts-line" data-r style="--i:4"><span><i class="dot"></i>Available now</span><span>{ico('globe')}Estonian, English, Ukrainian, Russian</span></p>
   </div>
   <div class="stage" data-r="media" style="--i:2">
@@ -248,6 +249,15 @@ def nums(items):
 def fig(inner, cap, cls="full"):
     return f'<figure class="{cls}" data-r="media">{inner}<figcaption>{cap}</figcaption></figure>' if cls else f'<figure data-r="media">{inner}<figcaption>{cap}</figcaption></figure>'
 
+ROLE = {
+ 'lobby': ('Product concept, call and music scenarios, UI design, testing with friends.', 'Built with AI-assisted coding using Claude.'),
+ 'bolt': ('UX audit of eight pages, page structure and content, visual direction in Bolt’s style, prototype review.', 'Prototype built with AI-assisted coding using Claude.'),
+ 'tallink': ('Campaign idea, offer structure, copy in Estonian and English, art direction across formats.', 'Landing page, film and print files produced with AI-assisted tools (Claude).'),
+ 'pilk': ('Business model, service offer and pricing, page briefs, review of every page.', 'Brand, design and code developed with Claude.'),
+ 'cosmetics': ('UX review of the live store, shelf logic by scent and hair type, product-page structure, screen review.', 'Shopify theme built with AI-assisted coding using Claude.'),
+ 'manguarvutid': ('First-screen sketch, picker logic, catalogue and product-page structure, success metrics.', 'Shopify theme built with AI-assisted coding using Claude.'),
+ 'restart': ('User flow, interface copy and UI design in Figma.', 'Built as a working site with AI-assisted coding using Claude.'),
+}
 LEADS = {
  'lobby': 'A voice app for playing with friends: everyone hears the same music, and it steps back the moment someone speaks.',
  'bolt': 'Every question a first-time visitor brings to bolt.eu ends in the same QR code. I redesigned four pages in Bolt’s own style so that each one answers first.',
@@ -270,8 +280,8 @@ BRIEF = {
 def case(slug, title_extra, facts, links, hero, sections, desc):
     R = '../../'; p = BY[slug]
     title_extra = LEADS.get(slug, title_extra)
-    facts = [x for x in facts if x[1] != 'Role']
-    facts = [(i, 'Role' if k == 'Who did what' else k, v) for i, k, v in facts]
+    facts = [(i, k, re.sub(r'[.;]? AI: [A-Za-z, ]+$', '', v)) for i, k, v in facts if k not in ('Role', 'Who did what')]
+    facts = [('user', 'Role', ROLE[slug][0])] + facts + [('tool', 'Development', ROLE[slug][1])]
     b = BRIEF.get(slug)
     brief = '' if not b else ('<div class="wrap"><dl class="brief" data-r>'
         + f'<div>{ico("chat")}<dt>Problem</dt><dd>{b[0]}</dd></div>'
@@ -480,11 +490,11 @@ def build_cases():
       '',
       '<div class="duo apart">' + img(R, 'cosmetics/os-home', 'Organic Shop concept, home page: a seasonal scrub banner, the menu and the shelf of signature scrubs', w=1440, h=900) + img(R, 'cosmetics/os-pdp-m', 'The product page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>',
       [
-       sec('01','The question', body_('Stores are sorted by product line. People arrive with a wish.',
-         'Nobody walks in looking for “the Fig &amp; Rosehip line”. They want a scrub that smells of mango, or a shampoo for oily hair. The catalogue knows the answer, but the visitor has to translate the wish into the store’s language first.',
+       sec('01','The question', body_('The store is sorted by product line. I think people arrive with a wish.',
+         'My assumption: few people arrive looking for “the Fig &amp; Rosehip line”. They want a scrub that smells of mango, or a shampoo for oily hair. The catalogue knows the answer, but the visitor has to translate the wish into the store’s language first.',
          '<p class="small">This is a view from outside. The brand knows what I cannot: what sells, what is returned, what its buyers search for. I would begin with that data and with what already works on the live site.</p>')),
        sec('02','The shelf', body_('“Pick your flavour.” Scrubs are bought by scent, shampoo by hair type.',
-         'Organic Shop makes natural cosmetics in Tallinn. Its best-known product is a body scrub that comes in a couple of dozen flavours, and nobody compares scrubs by formula. So the scrub shelf switches by scent, and the page takes the colour of the jar.',
+         'Organic Shop makes natural cosmetics in Tallinn. Its best-known product is a body scrub that comes in a couple of dozen flavours, and my hypothesis is that people choose a scrub by scent before formula. So the scrub shelf switches by scent, and the page takes the colour of the jar.',
          'For hair the question is different, so that part of the store starts from a sentence the visitor finishes: “My hair is oily”. The store’s real products and names are used throughout, so the concept can be judged as a store and not as a poster.')
          + fig(img(R,'cosmetics/os-flavour','“Pick your flavour”: mango, matcha mojito, raspberry, coconut, bellini, coffee, with the chosen jar and Add to bag', 'fl', w=1440, h=790), '<b>Pick your flavour.</b> Six scents as the menu; the jar, the name, the price and the button change with the choice.') +
          '<div class="pair">' +
@@ -583,10 +593,11 @@ def build_about():
 <section class="about"><div class="wrap">
   <h1 data-r>I am a junior product designer with an app my friends and I talk in, and a habit of building what I draw.</h1>
   <div class="bio">
-    <p class="lead" data-r>I am Andrii, Ukrainian, living in Tallinn. I speak Estonian fluently. By day I work in a supermarket and study software development; design is what I do every evening.</p>
+    <p class="lead" data-r>Everything on this site I can open, explain and change in front of you.</p>
+    <p data-r>I am Andrii, Ukrainian, living in Tallinn. I speak Estonian fluently. By day I work in a supermarket and study software development; design is what I do every evening.</p>
     <p data-r>I have no commercial design experience yet. What I have instead is finished work: a voice app that my friends and I use, a bolt.eu concept with a full audit and a coded prototype, a campaign carried across web, film, banners and print, a small banner studio I am starting, and working store concepts for cosmetics, gaming PCs and a repair service.</p>
-    <p data-r>I work with AI openly, and every case says who did what. I set the problem, make the decisions and accept or reject each screen; Claude writes the code and produces the files. Everything on this site I can open, explain and change in front of you.</p>
-    <div class="links" data-r>{ext(LINKEDIN, ico("in") + "LinkedIn", "go fill")}<a class="go" href="{R}index.html#work">See the work{ico('arrow')}</a></div>
+    
+    <div class="links" data-r>{ext(LINKEDIN, ico("in") + "LinkedIn", "go fill")}<a class="go" href="mailto:{EMAIL}">{ico("mail")}{EMAIL}</a><a class="go" href="{R}cv.pdf">CV (PDF)</a></div>
   </div>
   <div class="card">
     <div data-r><h2>How I work</h2><ul class="rows">
@@ -605,7 +616,7 @@ def build_about():
       <li>{ico('screen')}<span>Figma</span></li>
       <li>{ico('box')}<span>Shopify themes, WordPress and WooCommerce</span></li>
       <li>{ico('tool')}<span>HTML, CSS, JavaScript</span></li>
-      <li>{ico('pulse')}<span>Claude, for code and production</span></li>
+      <li>{ico('pulse')}<span>AI-assisted coding with Claude</span></li>
     </ul></div>
     <div data-r><h2>Details</h2><ul class="rows">
       <li>{ico('pin')}<span>Tallinn, or remote</span></li>
