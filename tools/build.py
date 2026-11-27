@@ -65,11 +65,11 @@ def page(R, path, title, desc, body, tone="", current=""):
 <footer class="foot"><div class="wrap">
   <div class="say">
     <p class="q">Have a question your product should answer better?</p>
-    <p class="lead">I am looking for a junior product, UX/UI or web design role, or an internship. In Tallinn or remote, available now.</p>
+    <p class="lead">I am looking for a junior product designer (UX/UI) role or an internship. In Tallinn or remote, available now.</p>
     <div class="links">{ext(LINKEDIN, ico("in") + "Write to me on LinkedIn", "go fill")}{mail}</div>
   </div>
   <div class="legal">
-    <p>Bolt and Tallink projects are independent concepts, not affiliated with or endorsed by those companies.</p>
+    <p>The Bolt, Tallink, Organic Shop and Mänguarvutid.ee projects are independent concepts, not affiliated with or endorsed by those companies.</p>
     <p><button class="motion" type="button" data-motion></button></p>
     <p>© 2026 Andrii Shnayder · Tallinn</p>
   </div>
@@ -95,12 +95,33 @@ P = [
       q='“Can December wait for a day?”',
       a='One idea carried through a landing page, a 15-second film, seven banner formats, print and a newsletter, in Estonian and English.',
       meta=[('user','Solo: idea, copy, design, production'),('print','Web, video, banners, A3 poster, A5 flyer, e-mail'),('flag','Independent concept, November 2026')]),
- dict(slug='minu-vahetus', tone='vahetus', n='04', name='Minu vahetus', kind='Shift schedule for shop staff · concept',
+ dict(slug='pilk', tone='pilk', n='04', name='Pilk', kind='My own banner studio · live site in three languages',
+      q='“Will it still read at 320 × 50?”',
+      a='A small studio that sells one thing: a banner idea delivered in every size an ad platform asks for. The first screen shows it happening.',
+      meta=[('box','26 sizes from one idea'),('chat','English, Estonian, Russian'),('pulse','Live, taking first requests')]),
+]
+P2 = [
+ dict(slug='cosmetics', tone='cosmetics', n='05', name='Organic Shop', kind='Online store redesign · unofficial concept',
+      q='“Which one is for me?”',
+      a='A cosmetics store with a very large range, where the shelf asks the buyer’s question first: scrubs by scent, hair care by hair type.',
+      meta=[('box','E-commerce · working Shopify theme')]),
+ dict(slug='manguarvutid', tone='mangu', n='06', name='Tähekaart', kind='Mänguarvutid.ee redesign · unofficial concept',
+      q='“Which PC will run my game?”',
+      a='A gaming-PC shop where you pick a game, a screen and a frame rate, and the cheapest computer that manages it steps forward.',
+      meta=[('screen','E-commerce · picker, catalogue as a map, configurator')]),
+ dict(slug='restart', tone='restart', n='07', name='Restart', kind='Laptop repair service · study project',
+      q='“My laptop is broken. What now?”',
+      a='A repair service that names the one price it can honestly promise, and tells you what happens after you press the button.',
+      meta=[('tool','Service booking · Figma to a working site')]),
+]
+# Minu vahetus is parked until it is ready (owner, 2026-11-27). To bring it back: add VAHETUS to P and set SHOW_VAHETUS = True.
+VAHETUS = dict(slug='minu-vahetus', tone='vahetus', n='04', name='Minu vahetus', kind='Shift schedule for shop staff · concept',
       q='“When do I work tomorrow, and what will I be doing?”',
       a='The paper schedule and the task card on the back-room wall, moved to the phone. It comes from my own job in a supermarket.',
-      meta=[('user','Solo: problem from my own workplace, UX, UI, prototype'),('phone','Clickable prototype, Estonian and Russian'),('flag','Concept with sample data, November 2026')]),
-]
-BY = {p['slug']: p for p in P}
+      meta=[('user','Solo: problem from my own workplace, UX, UI, prototype'),('phone','Clickable prototype, Estonian and Russian'),('flag','Concept with sample data, November 2026')])
+SHOW_VAHETUS = False
+ALL = P + P2 + ([VAHETUS] if SHOW_VAHETUS else [])
+BY = {p['slug']: p for p in ALL}
 
 def home_media(R, p):
     s = p['slug']
@@ -110,13 +131,31 @@ def home_media(R, p):
         inner = '<div class="duo">' + vid(R, 'bolt/rides', alt='Bolt Rides page concept: a fare range for the visitor’s own route') + vid(R, 'bolt/phone', 'phone', ' data-par="46"', 'The same concept on a phone') + '</div>'
     elif s == 'tallink':
         inner = '<div class="duo">' + img(R, 'tallink/landing', 'Campaign landing page: a ferry at night whose lights reflect on the sea as a pause sign', w=1440, h=900) + vid(R, 'tallink/paus-916', 'phone', ' data-par="46"', 'The 15-second campaign film in vertical format') + '</div>'
+    elif s == 'cosmetics':
+        return img(R, 'cosmetics/os-flavour', 'Organic Shop concept: “Pick your flavour”, six scrub scents as the menu', 'fl', w=1440, h=790)
+    elif s == 'manguarvutid':
+        return vid(R, 'manguarvutid/picker', alt='Mänguarvutid concept: choosing games, resolution and frame rate changes the recommended PC')
+    elif s == 'restart':
+        return img(R, 'restart/hero', 'Restart: “If your laptop is broken, we can help you”, with one button to book diagnostics', w=1440, h=900)
+    elif s == 'pilk':
+        inner = '<div class="duo">' + vid(R, 'pilk/morph', alt='Pilk home page: one banner changes shape through six formats as the page scrolls, then spreads into all 26 sizes') + img(R, 'pilk/m', 'The same page on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>'
     else:
         inner = '<div class="duo left">' + img(R, 'minu-vahetus/manager-d', 'Manager view: who has seen the schedule, pending requests, sick notes') + vid(R, 'minu-vahetus/flow', 'phone', ' data-par="46"', 'Worker view on a phone: confirming the week and asking for a day off') + '</div>'
     return f'<a class="media" href="{R}work/{s}/index.html" data-cursor="Open case" data-r="media" aria-label="Open the {p["name"]} case">{inner}</a>'
 
 def build_home():
     R = ''
-    idx = ''.join(f'<li><a href="#{p["slug"]}"><span class="n">{p["n"]} · {p["name"]}</span><span class="t">{p["q"]}</span></a></li>' for p in P)
+    idx = ''.join(f'<li><a href="#{p["slug"]}"><span class="n">{p["n"]} · {p["name"]}</span><span class="t">{p["q"]}</span></a></li>' for p in ALL)
+    more = ''
+    for i, p in enumerate(P2):
+        ic, t = p['meta'][0]
+        more += f'''<a class="mcard" id="{p['slug']}" href="work/{p['slug']}/index.html" data-cursor="Open case" data-r style="--i:{i}">
+  {home_media(R, p)}
+  <span class="kicker"><i>{p['n']}</i><b>{p['name']}</b></span>
+  <span class="q">{p['q']}</span>
+  <span class="a">{p['a']}</span>
+  <span class="m">{ico(ic)}{t}</span>
+</a>'''
     rows = ''
     for p in P:
         meta = ''.join(f'<li>{ico(i)}<span>{t}</span></li>' for i, t in p['meta'])
@@ -137,23 +176,38 @@ def build_home():
   <div class="say">
     <p class="kicker" data-r>{ico('pin')}Product designer · Tallinn</p>
     <h1 data-r style="--i:1">I start with the question a person actually has, and design until the product answers it.</h1>
-    <p class="lead" data-r style="--i:2">Four projects, each named after its question. One of them is a real app my friends and I talk in. I design in Figma and build with AI tools, so an idea gets tested as a working thing, not as a slide.</p>
+    <p class="lead" data-r style="--i:2">Seven projects, each named after its question: a voice app my friends and I talk in, ride-hailing pages, a ferry campaign, my own banner studio, a cosmetics store, a gaming-PC shop and a repair service. I design in Figma and build with AI tools, so an idea gets tested as a working thing, not as a slide.</p>
     <div class="links" data-r style="--i:3"><a class="go fill" href="#work">See the work{ico('arrow')}</a><a class="go" href="about/index.html">About me</a></div>
     <p class="facts-line" data-r style="--i:4"><span><i class="dot"></i>Available now</span><span>{ico('globe')}Estonian, English, Ukrainian, Russian</span></p>
   </div>
   <div class="stage" data-r="media" style="--i:2">
     <div class="rel">
     <a href="work/lobby/index.html" data-cursor="Lobby" aria-label="Open the Lobby case"><div class="frame wide"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/lobby/call.jpg" aria-label="Lobby call screen: four friends in a pixel forest at night"><source src="assets/work/lobby/call.mp4" type="video/mp4"></video></div></a>
-    <a href="work/minu-vahetus/index.html" data-cursor="Minu vahetus" aria-label="Open the Minu vahetus case"><div class="frame phone"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/minu-vahetus/flow.jpg" aria-label="Minu vahetus: a shift schedule on a phone"><source src="assets/work/minu-vahetus/flow.mp4" type="video/mp4"></video></div></a>
+    <a href="work/bolt/index.html" data-cursor="Bolt" aria-label="Open the Bolt case"><div class="frame phone"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/bolt/phone.jpg" aria-label="The bolt.eu concept on a phone"><source src="assets/work/bolt/phone.mp4" type="video/mp4"></video></div></a>
     </div>
-    <p class="small cap">Both are running products, recorded live: Lobby (01) and Minu vahetus (04).</p>
+    <p class="small cap">Recorded live from working builds: Lobby (01) and the bolt.eu concept (02).</p>
+    <template data-for="ecommerce" data-cap="A working store concept, recorded live: Tähekaart (06).">
+    <a href="work/manguarvutid/index.html" data-cursor="Tähekaart" aria-label="Open the Tähekaart case"><div class="frame wide"><video data-auto autoplay muted loop playsinline preload="auto" poster="assets/work/manguarvutid/picker.jpg" aria-label="Gaming-PC store concept: choosing a game and a frame rate changes the recommended PC"><source src="assets/work/manguarvutid/picker.mp4" type="video/mp4"></video></div></a>
+    <a href="work/manguarvutid/index.html" data-cursor="Tähekaart" aria-label="Open the Tähekaart case"><div class="frame phone"><img src="assets/work/manguarvutid/m.webp" alt="The same picker on a phone" width="780" height="1688"></div></a>
+    </template>
+    <template data-for="beauty" data-cap="A working store concept for Organic Shop (05). Independent, not affiliated with the brand.">
+    <a href="work/cosmetics/index.html" data-cursor="Cosmetics" aria-label="Open the cosmetics case"><div class="frame wide"><img src="assets/work/cosmetics/os-home.webp" alt="Organic Shop concept: home page with a seasonal scrub banner" width="1440" height="900"></div></a>
+    <a href="work/cosmetics/index.html" data-cursor="Cosmetics" aria-label="Open the cosmetics case"><div class="frame phone"><img src="assets/work/cosmetics/os-pdp-m.webp" alt="The product page on a phone" width="390" height="844"></div></a>
+    </template>
   </div>
 </section>
 <nav class="index wrap" id="work" aria-label="Projects" data-r><ol>{idx}</ol></nav>
 {rows}
+<section class="more" data-tone-zone="base"><div class="wrap">
+  <div class="head">
+    <p class="kicker" data-r>{ico('box')}More work</p>
+    <h2 data-r style="--i:1">Three shorter studies. Different shelves, same habit: find the buyer’s question and put the answer on the first screen.</h2>
+  </div>
+  <div class="mgrid">{more}</div>
+</div></section>
 '''
     page(R, 'index.html', 'Andrii Shnayder · product designer, Tallinn',
-         'Product designer in Tallinn. Four projects, each named after the question it answers: a voice app, a bolt.eu concept, a Tallink campaign and a shift schedule.', body, current='work')
+         'Product designer in Tallinn. Seven projects, each named after the question it answers: a voice app, a bolt.eu concept, a Tallink campaign, a banner studio, a cosmetics store, a gaming-PC shop and a repair service.', body, current='work')
 
 # ------------------------------------------------------------------ case pages
 def sec(n, label, inner):
@@ -170,7 +224,7 @@ def fig(inner, cap, cls="full"):
 def case(slug, title_extra, facts, links, hero, sections, desc):
     R = '../../'; p = BY[slug]
     f = ''.join(f'<div>{ico(i)}<dt>{k}</dt><dd>{v}</dd></div>' for i, k, v in facts)
-    order = [x['slug'] for x in P]; nx = BY[order[(order.index(slug) + 1) % len(order)]]
+    order = [x['slug'] for x in ALL]; nx = BY[order[(order.index(slug) + 1) % len(order)]]
     body = f'''
 <header class="wrap case-head">
   <p class="back" data-r><a href="{R}index.html#{slug}">{ico('back')}All work</a></p>
@@ -197,7 +251,8 @@ def build_cases():
       [('user','Role','Idea, product decisions, UX, UI canvases, testing. Code written with Claude under my direction.'),
        ('cal','When','November 2026, ongoing'),
        ('tool','Built with','Design canvases, Svelte, Tauri, Rust voice engine, Supabase'),
-       ('pulse','Status','Version 0.14, in testing with friends')],
+       ('pulse','Status','Version 0.14, in testing with friends'),
+       ('chat','Who did what','Me: the idea, every product decision, the design canvases, testing with friends. Claude: the code')],
       ext('https://lobby-voice.online', 'Visit lobby-voice.online', 'go fill'),
       vid(R, 'lobby/call', alt='Lobby call screen: four friends as pixel beetles in a night forest, a track playing in the header, call chat below'),
       [
@@ -222,8 +277,6 @@ def build_cases():
        sec('04','In numbers', nums([
          ('cal','14 days','from the first call by link to version 0.14 (7 to 21 November 2026)'),
          ('globe','7','interface languages: English, Estonian, Ukrainian, Russian, Polish, Latvian, Lithuanian'),
-         ('check','901','automated tests passing on the last release'),
-         ('box','≈ 4 MB','installer size. Lightness was a requirement from the start'),
        ]) + '<p class="note" data-r>These are facts about the build, not about users. Lobby is tested by a small group of friends, and I have no usage statistics worth showing yet.</p>'),
        sec('05','What I learned', body_('A product is mostly decisions nobody sees.',
          'When voice over WebRTC started to stutter, I had the delay measured and moved to our own engine and relay. When the build drifted from my drawings, I sent it back until it matched. Most of my time went into choices like these, not into screens.',
@@ -237,7 +290,8 @@ def build_cases():
       [('user','Role','Solo and self-initiated: content audit, UX, UI, coded prototype'),
        ('cal','When','October 2026'),
        ('tool','Built with','Figma (tokens, components, handoff), HTML, CSS, JavaScript, OpenStreetMap data. AI: Claude, Higgsfield'),
-       ('flag','Status','Independent concept, not affiliated with Bolt')],
+       ('flag','Status','Independent concept, not affiliated with Bolt'),
+       ('chat','Who did what','Me: the audit, the decisions, direction and sign-off on every page. Claude: the prototype code')],
       ext('https://lgf5411.github.io/bolt-web-concept/', 'Read the full case study', 'go fill') + ext('https://lgf5411.github.io/bolt-web-concept/prototype/', 'Open the prototype'),
       '<div class="duo">' + vid(R, 'bolt/rides', alt='Rides page concept: a fare range for each ride type on the visitor’s own route') + vid(R, 'bolt/phone', 'phone', ' data-par="46"', 'The Car-sharing page on a phone') + '</div>',
       [
@@ -269,12 +323,13 @@ def build_cases():
     # ---------------- Tallink
     case('tallink',
       '“Pane detsember pausile” (Put December on pause) is a Christmas campaign concept for Tallink. December is gifts, deadlines, parties and traffic. A ferry is the one place where none of it can reach you for a day.',
-      [('user','Role','Solo: idea, copy in Estonian and English, design, production'),
+      [('user','Role','Self-initiated: the idea, the direction, final copy in Estonian and English'),
        ('cal','When','November 2026'),
        ('tool','Built with','HTML, CSS, JavaScript; video, print files and sound generated in code. AI: Claude'),
-       ('flag','Status','Independent concept, made as an application piece. Prices and dates are samples')],
+       ('flag','Status','Independent concept, made as an application piece. Prices and dates are samples'),
+       ('chat','Who did what','Me: the idea, the choices, sign-off on every format. Claude: code, production files, copy drafts')],
       ext('https://lgf5411.github.io/Talink/', 'Open the campaign site', 'go fill'),
-      '<div class="duo">' + img(R, 'tallink/landing', 'Landing page: a ferry at night, its lights reflected on the water as two bars, with a booking bar below the headline', w=1440, h=900) + '<div class="frame phone" data-par="46"><video controls playsinline preload="none" poster="' + R + 'assets/work/tallink/paus-916.jpg" aria-label="The 15-second campaign film, with sound"><source src="' + R + 'assets/work/tallink/paus-916.mp4" type="video/mp4"></video></div></div>',
+      '<div class="duo">' + img(R, 'tallink/landing', 'Landing page: a ferry at night, its lights reflected on the water as two bars, and one button below the headline: choose your pause', w=1440, h=900) + '<div class="frame phone" data-par="46"><video controls playsinline preload="none" poster="' + R + 'assets/work/tallink/paus-916.jpg" aria-label="The 15-second campaign film, with sound"><source src="' + R + 'assets/work/tallink/paus-916.mp4" type="video/mp4"></video></div></div>',
       [
        sec('01','The idea', body_('The pause sign was already on the water.',
          'A ferry at night throws two tall reflections of light onto the sea. Side by side they read as a pause sign. That one image carries the campaign: the headline, the button (“Vali oma paus”, choose your pause) and the cut in the film all use it.',
@@ -287,7 +342,7 @@ def build_cases():
          '</div>' +
          fig(img(R,'tallink/banner-wide','Wide banner 1200 by 628 in Estonian', 'b', w=1200, h=628), '<b>1200 × 628.</b> The layout holds from a 728 × 90 strip to a vertical story.')),
        sec('03','What is in the package', nums([
-         ('screen','1','landing page with a booking bar, built for GitHub Pages'),
+         ('screen','1','landing page, checked against the real tallink.com page: one choice on the first screen instead of a booking form'),
          ('eye','3','film cuts: 15 s vertical, 15 s square, 6 s vertical, with original sound'),
          ('box','14','banners: 7 formats in 2 languages'),
          ('print','2','print files: A3 poster and A5 flyer'),
@@ -295,13 +350,49 @@ def build_cases():
       ],
       'Pane detsember pausile: an unofficial Christmas campaign concept for Tallink across web, film, banners and print. Case by Andrii Shnayder.')
 
-    # ---------------- Minu vahetus
-    case('minu-vahetus',
+
+    # ---------------- Pilk
+    case('pilk',
+      'Pilk is a small banner studio I am starting in Tallinn. A business orders one banner, and then the ad platform asks for twelve sizes. Pilk sells the whole set, and its site has to prove in one scroll that an idea can survive all of them.',
+      [('user','Role','Founder. I decide what the studio sells and refuses, the prices, the brief for every page, and what goes live'),
+       ('cal','When','November 2026, ongoing'),
+       ('tool','Built with','Static HTML, CSS and JavaScript, its own banner engine. AI: Claude'),
+       ('pulse','Status','Live and taking first requests. No paying clients yet; the examples on the site are invented businesses and say so'),
+       ('chat','Who did what','Me: the business, the offer, the prices, the brief and sign-off for every page. Claude: design proposals, the brand, the code')],
+      ext('https://lgf5411.github.io/pilk/', 'Open the live site', 'go fill'),
+      '<div class="duo">' + vid(R, 'pilk/morph', alt='Pilk home page: while the page scrolls, one banner changes shape from a medium rectangle to a leaderboard, a square post, a story and a billboard, then spreads into all 26 sizes') + img(R, 'pilk/m', 'The same page on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>',
+      [
+       sec('01','The question', body_('One banner is never one banner.',
+         'A café makes a nice square post. Then Google wants a 728 × 90 strip, Instagram wants a story, and the printer wants a poster. The same picture gets squeezed, the headline stops fitting, the button disappears.',
+         'So the question a buyer really has is not “can you design a banner?” but “will it still read when it is a thin strip on a phone?”. The site answers that before it says anything about the studio.')),
+       sec('02','What I decided', steps([
+         ('The first screen is the product working', 'Scroll, and one banner turns into a leaderboard, a square, a story, a billboard, and then lays out all 26 sizes. No claim about quality, just the thing happening.'),
+         ('Your words, immediately', 'A field under the banner says “Your headline”. Type your own offer and every size on the page shows it.'),
+         ('Sell only what can be promised', 'Six services with a price and a date each, and a section called “What we don’t take on”. A new studio earns trust faster by refusing than by listing everything.'),
+         ('Prices and dates on the page', '“48 h to the first sketch”, “12 sizes for €390”. Nobody has to write an e-mail to learn whether they can afford it.'),
+         ('A free test instead of a client list', 'A new studio has no cases to show. So the offer is: send one banner, get three sizes back, free. The work is the reference.'),
+         ('A brief that answers back', 'Five short questions, and the price and the date appear while you fill them in, before you send anything.'),
+       ])),
+       sec('03','The screens',
+         fig(img(R,'pilk/sizes','Banner size guide: all 26 sizes, where each one runs and the one rule that matters for it'), '<b>Size guide.</b> All 26 sizes, where each runs, and one rule per size. Free to use without ordering, which is also how people find the studio.') +
+         '<div class="pair">' +
+         fig(img(R,'pilk/brief','Start a brief: step 1 of 5 with services and prices, and a running summary on the right'), '<b>Brief.</b> The summary and the estimate build on the right as you answer.', '') +
+         fig(img(R,'pilk/demo','An example site for a lunch café, marked as an example design by Pilk'), '<b>Example site.</b> A full sample for an invented café, labelled as an example at the bottom of every page.', '') +
+         '</div>'),
+       sec('04','What is real and what is not', body_('It is a business on day one, and the page says so.',
+         'The site is live in English, Estonian and Russian. The offer, the prices and the free test are real. There are no client cases yet, the example businesses are made up and labelled, and the Estonian text is still waiting for a careful read.',
+         'What I am learning here is not layout. It is what a stranger needs to see before they send money to someone they have never heard of.')),
+      ],
+      'Pilk: a small banner studio in Tallinn whose home page shows one idea surviving 26 sizes. Case by Andrii Shnayder.')
+
+    # ---------------- Minu vahetus (parked)
+    (case if SHOW_VAHETUS else (lambda *a, **k: None))('minu-vahetus',
       'Minu vahetus (“My shift”) is a schedule for shop-floor staff. I work in a supermarket, and this is the tool I wanted on my own first day.',
       [('user','Role','Solo: the problem comes from my own job. UX, UI, clickable prototype'),
        ('cal','When','November 2026'),
        ('tool','Built with','HTML, CSS, JavaScript. AI: Claude'),
-       ('flag','Status','Concept with sample data. Next step: show it to the store manager')],
+       ('flag','Status','Concept with sample data. Next step: show it to the store manager'),
+       ('chat','Who did what','Me: the problem, the flow, both rebuilds. Claude: the prototype code')],
       f'<a class="go fill" href="prototype/index.html">Try the prototype{ico("arrow")}</a><a class="go" href="prototype/index.html?lang=ru">In Russian</a>',
       '<div class="duo left">' + img(R, 'minu-vahetus/worker-d', 'Worker view on desktop: the week as a list, today’s tasks on a timeline, a confirm button') + vid(R, 'minu-vahetus/flow', 'phone', ' data-par="46"', 'Worker view on a phone: confirming the week, asking for a day off, the manager approving it') + '</div>',
       [
@@ -328,15 +419,127 @@ def build_cases():
       ],
       'Minu vahetus: a shift schedule concept for shop-floor staff, in Estonian and Russian, with a clickable prototype. Case by Andrii Shnayder.')
 
+    # ---------------- Organic Shop
+    case('cosmetics',
+      'Organic Shop makes natural cosmetics in Tallinn and sells a very large range. A shelf of two hundred similar jars and bottles is hard to choose from, so in my redesign concept the store asks the buyer’s question first and sorts the shelf by the answer.',
+      [('user','Role','Solo and self-initiated: UX review of the live site, concept, UI. Theme code written with Claude under my direction'),
+       ('cal','When','October to November 2026'),
+       ('tool','Built with','Shopify theme (Liquid, CSS, JavaScript), Figma. AI: Claude'),
+       ('flag','Status','Independent concept, not affiliated with Organic Shop. Built as a working theme with the store’s real products'),
+       ('chat','Who did what','Me: the review, the concept, sign-off on every screen. Claude: the theme code')],
+      '',
+      '<div class="duo apart">' + img(R, 'cosmetics/os-home', 'Organic Shop concept, home page: a seasonal scrub banner, the menu and the shelf of signature scrubs', w=1440, h=900) + img(R, 'cosmetics/os-pdp-m', 'The product page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>',
+      [
+       sec('01','The question', body_('Stores are sorted by product line. People arrive with a wish.',
+         'Nobody walks in looking for “the Fig &amp; Rosehip line”. They want a scrub that smells of mango, or a shampoo for oily hair. The catalogue knows the answer, but the visitor has to translate the wish into the store’s language first.',
+         'So the first screen of each shelf does the translating.',
+         '<p class="small">This is a view from outside. The brand knows what I cannot: what sells, what is returned, what its buyers search for. I would begin with that data and with what already works on the live site.</p>')),
+       sec('02','The shelf', body_('“Pick your flavour.” Scrubs are bought by scent, shampoo by hair type.',
+         'Organic Shop makes natural cosmetics in Tallinn. Its best-known product is a body scrub that comes in a couple of dozen flavours, and nobody compares scrubs by formula. So the scrub shelf switches by scent, and the page takes the colour of the jar.',
+         'For hair the question is different, so that part of the store starts from a sentence the visitor finishes: “My hair is oily”. The store’s real products and names are used throughout, so the concept can be judged as a store and not as a poster.')
+         + fig(img(R,'cosmetics/os-flavour','“Pick your flavour”: mango, matcha mojito, raspberry, coconut, bellini, coffee, with the chosen jar and Add to bag', 'fl', w=1440, h=790), '<b>Pick your flavour.</b> Six scents as the menu; the jar, the name, the price and the button change with the choice.') +
+         '<div class="pair">' +
+         fig(img(R,'cosmetics/os-catalog','Body scrubs catalogue: 28 products, a price filter, sorting, Add on every card', 'r', w=1440, h=1020), '<b>Catalogue.</b> 28 scrubs, price filter, sorting and Add on every card. Under the grid, a short guide to choosing between sugar and salt.', '') +
+         fig(img(R,'cosmetics/os-pdp','Product page for the mango scrub: size, price, Add to bag, delivery and returns, then what it does, who it is for and why this one', 'pd', w=1440, h=1340), '<b>Product page.</b> What it does, who it is for, why this one. Delivery and returns sit under the button, not in the footer.', '') +
+         '</div>' +
+         '<div class="pair">' +
+         fig(img(R,'cosmetics/organic-hair','Hair: the hero reads “My hair is oily”, with hair types to choose from', w=1440, h=900), '<b>Hair.</b> The sentence is the menu: oily, damaged, thinning, normal, coloured.', '') +
+         fig(img(R,'cosmetics/organic-routine','Three products of one line as steps 1, 2 and 3, with one button that adds all of them', 'r', w=1440, h=1020), '<b>One routine, one button.</b> Shampoo, conditioner and mask as steps 1, 2, 3; one button adds all three.', '') +
+         '</div>'),
+       sec('03','What I decided', steps([
+         ('The menu is the buyer’s own words', 'Scents for scrubs, hair types for hair care. Product lines stay, one level down.'),
+         ('The button is on the first screen', 'The chosen jar comes with its size, its price and Add to bag, so choosing and buying are one step.'),
+         ('A product page answers three questions', 'What it does, who it is for, why this one. Then how to use it and the questions people ask.'),
+         ('Doubts are answered next to the button', 'Stock, delivery and the 14-day return sit under Add to bag, not in the footer.'),
+         ('A routine is one purchase', 'Shampoo, conditioner and mask from one line are steps 1, 2, 3 with a single button.'),
+         ('Text that helps search and people at once', 'A short guide under the catalogue grid (sugar or salt, how to use a scrub) instead of a block of keywords.'),
+       ]) + '<p class="note" data-r>The concept has not been tested with shoppers or shown to the company. The next honest step would be five people and one task: “find a scrub you would buy as a gift”.</p>'),
+      ],
+      'Organic Shop: an unofficial redesign concept where scrubs are chosen by scent and hair care by hair type. Case by Andrii Shnayder.')
+
+    # ---------------- Mänguarvutid
+    case('manguarvutid',
+      'Mänguarvutid.ee sells gaming PCs in Tallinn. A catalogue of graphics-card names only helps people who already know the answer. “Tähekaart” (star map) is my redesign concept: say what you play, and the shop does the comparing.',
+      [('user','Role','Solo and self-initiated: UX review, concept, UI. Theme code written with Claude under my direction'),
+       ('cal','When','October 2026'),
+       ('tool','Built with','Shopify theme (Liquid, CSS, JavaScript), my own first-screen sketch. AI: Claude'),
+       ('flag','Status','Independent concept, not affiliated with the shop. Part of the prices and builds are samples; frame rates are modelled'),
+       ('chat','Who did what','Me: the first-screen sketch, the decisions, sign-off on every page. Claude: the theme code, the sample data')],
+      '',
+      '<div class="duo">' + vid(R, 'manguarvutid/picker', alt='Choosing games, resolution and frame rate: the recommended PC, its frame rates and its price change with every choice') + img(R, 'manguarvutid/m', 'The picker on a phone', 'phone', ' data-par="46"', w=780, h=1688) + '</div>',
+      [
+       sec('01','The question', body_('The buyer knows the game. The shop answers in part numbers.',
+         'Someone buying a first gaming PC knows three things: what they play, what monitor they have and how smooth they want it. A product list answers in RTX 5070, Ryzen 5 7600X and DDR5. Between the two sits a comparison most people cannot make.',
+         '<p class="small">This is my reading of the public site, not the shop’s sales data. I would check it against their analytics before changing a live store.</p>')),
+       sec('02','What I decided', steps([
+         ('Four choices instead of a spec sheet', 'Device, kind of games, resolution, target frame rate. Each choice explains itself in one line (“1080p is the most common monitor”).'),
+         ('The cheapest PC that manages it comes first', 'Not the most expensive one. The card shows frames per second in four named games and marks which of them reach the target.'),
+         ('The catalogue is a sky', 'Every PC is a star: further right costs more, higher gives more frames in your game. A horizon line sits at your target, and everything above it will do.'),
+         ('Specifications stay, in second place', 'Name, key parts with their real numbers, a large price, Add to cart. When the button scrolls away, a buy bar follows.'),
+         ('A configurator for those who know', 'Eight steps from processor to case. At each one the shop says what fits, what is at the limit and what will not work together.'),
+         ('The shop’s own trust signals, up front', 'Built in Tallinn, tested before shipping, two physical stores, instalments. They sit directly under the recommendation, where the doubt is.'),
+       ])),
+       sec('03','The screens',
+         fig(img(R,'manguarvutid/sky','The catalogue as a star map: PCs plotted by price and frame rate, with a horizon line at 144 FPS'), '<b>Kogu taevas ühe pilguga</b> (the whole sky at a glance). Switch the game, the resolution or the target and the stars move.') +
+         fig(img(R,'manguarvutid/pdp','Product page: name, key specifications, price and Add to cart'), '<b>Product page.</b> Parts with concrete numbers, then the price and one button.') +
+         fig(img(R,'manguarvutid/conf','Configurator: step 1 of 8, choosing a processor'), '<b>Configurator.</b> Eight steps, with a recommendation and a reason at each.')),
+       sec('04','Where the map stops', body_('A sky works for a few dozen PCs. It would not work for hundreds of monitors.',
+         'The map needs one axis everybody understands, and gaming PCs have it: frames per second. Accessories do not. So that part of the store is an ordinary list with filters by the properties people actually compare, a sort order and a count, and each row says which PC it suits.',
+         'The cart keeps the answers to the last doubts next to the checkout button: delivery, how to pay, returns.')
+         + fig(img(R,'manguarvutid/filters','Monitors as a filtered list: size, resolution, refresh rate, panel, brand, price; each row names the PC it suits'), '<b>Monitors.</b> Six filters, sorting, and a “suits” line under each product instead of a second comparison.') +
+         fig(img(R,'manguarvutid/cart','Cart with one PC, the total with VAT, and delivery, payment and returns beside the checkout button'), '<b>Cart.</b> Total with VAT, the monthly instalment, then delivery, payment and returns in three lines.')),
+       sec('05','How I would know it works', steps([
+         ('Hypothesis', 'People who state what they play reach a product page more often than people who start from the catalogue.'),
+         ('What I would measure', 'Share of visits that reach a product page, add-to-cart rate from the picker against the list, and how often the first recommendation is the one bought.'),
+         ('How', 'Picker against the current home page as an A/B test on the shop’s real traffic; before that, five people and one task: “find a PC for your game under your budget”.'),
+         ('What would make me drop it', 'If people skip the picker and scroll straight to the list, the list becomes the first screen and the picker a filter on top of it.'),
+       ])),
+       sec('06','What is real and what is not', body_('A concept with sample data should say so on every page.',
+         'A strip at the top of the store reads “Disainikontseptsioon”: some prices and builds are samples and frame rates come from a model, not from benchmarks I ran. Product photos are marked as illustrative. Before this could go live, every number would have to come from the shop.',
+         'It also exists in a light theme, because a dark page full of stars is a choice, not a requirement.')),
+      ],
+      'Tähekaart: an unofficial redesign concept for Mänguarvutid.ee where the buyer picks a game and a frame rate instead of a graphics card. Case by Andrii Shnayder.')
+
+    # ---------------- Restart
+    case('restart',
+      'Restart is a laptop repair service I designed for a UX course. The brief was a booking site. The real task turned out to be removing the fear of an open-ended bill.',
+      [('user','Role','Solo: research questions, flow, UI in Figma. Built as a working site with Claude from my Figma design'),
+       ('cal','When','October 2026'),
+       ('tool','Built with','Figma, Shopify theme. AI: Claude'),
+       ('flag','Status','Study project. The service is invented'),
+       ('chat','Who did what','Me: the flow and the Figma design, by hand. Claude: turning it into a working site')],
+      '',
+      '<div class="duo">' + img(R, 'restart/hero', 'Restart home page: “If your laptop is broken, we can help you”, one button to book diagnostics, and a line with the price below it', w=1440, h=900) + img(R, 'restart/m', 'The same page on a phone', 'phone', ' data-par="46"', w=390, h=844) + '</div>',
+      [
+       sec('01','The question', body_('You do not know what is broken, so nobody can tell you the price.',
+         'A person with a dead laptop cannot describe the fault and expects to be overcharged. Most repair sites answer with a price list of thirty services, which only helps if you already know which one you need.',
+         'I started from what the service can honestly promise before it has seen the machine. It is exactly one thing: what the diagnosis costs.')),
+       sec('02','What I decided', steps([
+         ('One number on the page', 'Diagnostics cost 20 €. If you go ahead with the repair, it is included. If you decline, that is all you pay.'),
+         ('“Describe what you noticed” is enough to start', 'The second sentence on the page says it: you do not have to know what is wrong. Say what you see, in your own words.'),
+         ('No repair without your yes', 'The line sits under the main button and again in the price table, because it is the sentence people look for.'),
+         ('What happens next, as four steps', 'We call you, you bring the laptop, we find the cause, you decide. Each step has a time attached.'),
+         ('No account, no online payment', 'You pay at the workshop. Asking for a card before anyone has seen the laptop would bring the fear straight back.'),
+         ('Quiet on purpose', 'One typeface, almost no colour, a lot of white. Someone whose computer just died does not need a lively website.'),
+       ])),
+       sec('03','The screens',
+         fig(img(R,'restart/price','“What you pay for”: 20 € for diagnostics, and what happens if you repair or decline', w=1440, h=900), '<b>What you pay for.</b> The only fixed price, and both outcomes spelled out.') +
+         fig(img(R,'restart/steps','What happens after you send a request: four numbered steps', 'st', w=1440, h=500), '<b>After you send a request.</b> Four steps, each with its own deadline.')),
+       sec('04','What I learned', body_('The smallest project taught me the most about copy.',
+         'There is almost nothing to draw here. The whole design is the order of six sentences and which of them gets to be large. It is the project I would show to explain how I think about words in an interface.',
+         'It was not tested with people outside the course.')),
+      ],
+      'Restart: a study UX project for a laptop repair service built around one honest price. Case by Andrii Shnayder.')
+
 def build_about():
     R = '../'
     body = f'''
 <section class="about"><div class="wrap">
-  <h1 data-r>I am a product designer at the start, with one shipped app and a habit of building what I draw.</h1>
+  <h1 data-r>I am a junior product designer with an app my friends and I talk in, and a habit of building what I draw.</h1>
   <div class="bio">
     <p class="lead" data-r>I am Andrii, Ukrainian, living in Tallinn. I speak Estonian fluently. By day I work in a supermarket and study software development; design is what I do every evening.</p>
-    <p data-r>I have no commercial design experience yet. What I have instead is finished work: a voice app that my friends and I use, a bolt.eu concept with a full audit and a coded prototype, a campaign carried across web, film, banners and print, and a schedule tool drawn from my own job.</p>
-    <p data-r>I work with AI openly. I decide what to build and why, draw it, and then build it with Claude instead of waiting for a developer. Everything on this site I can open, explain and change in front of you.</p>
+    <p data-r>I have no commercial design experience yet. What I have instead is finished work: a voice app that my friends and I use, a bolt.eu concept with a full audit and a coded prototype, a campaign carried across web, film, banners and print, a small banner studio I am starting, and working store concepts for cosmetics, gaming PCs and a repair service.</p>
+    <p data-r>I work with AI openly, and every case says who did what. I set the problem, make the decisions and accept or reject each screen; Claude writes the code and produces the files. Everything on this site I can open, explain and change in front of you.</p>
     <div class="links" data-r>{ext(LINKEDIN, ico("in") + "LinkedIn", "go fill")}<a class="go" href="{R}index.html#work">See the work{ico('arrow')}</a></div>
   </div>
   <div class="card">
@@ -346,11 +549,17 @@ def build_about():
       <li>{ico('tool')}<span>Build the thing, not a picture of it: Figma for the system, code for the behaviour.</span></li>
       <li>{ico('flag')}<span>Say plainly what is a fact, what is a guess and what I have not tested.</span></li>
     </ul></div>
+    <div data-r><h2>What I can take on</h2><ul class="rows">
+      <li>{ico('phone')}<span>Product and app UX: flows, screens, prototypes that click</span></li>
+      <li>{ico('box')}<span>E-commerce: store structure, product pages, cart, Shopify themes</span></li>
+      <li>{ico('print')}<span>Campaign pages and banners for a product</span></li>
+      <li>{ico('chat')}<span>Interface copy in English and Estonian</span></li>
+    </ul></div>
     <div data-r><h2>Tools</h2><ul class="rows">
-      <li>{ico('screen')}<span>Figma: tokens, components, handoff</span></li>
+      <li>{ico('screen')}<span>Figma</span></li>
       <li>{ico('box')}<span>Shopify themes, WordPress and WooCommerce</span></li>
       <li>{ico('tool')}<span>HTML, CSS, JavaScript</span></li>
-      <li>{ico('pulse')}<span>AI: Claude, Higgsfield, Google Flow</span></li>
+      <li>{ico('pulse')}<span>Claude, for code and production</span></li>
     </ul></div>
     <div data-r><h2>Details</h2><ul class="rows">
       <li>{ico('pin')}<span>Tallinn, or remote</span></li>

@@ -5,6 +5,32 @@
   var reduce = root.classList.contains('calm');
   var osReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* 0a. One site, three reading orders. ?for=product | ecommerce | beauty puts the relevant work first.
+        The choice is kept for the visit, so it survives a trip into a case and back. Without it, nothing changes. */
+  (function () {
+    var f = null;
+    try { f = new URLSearchParams(location.search).get('for') || sessionStorage.getItem('for'); } catch (e) {}
+    var orders = { product: ['bolt', 'lobby', 'pilk', 'tallink'], ecommerce: ['manguarvutid', 'cosmetics', 'restart'], beauty: ['cosmetics', 'manguarvutid', 'restart'] };
+    if (!f || !orders[f]) return;
+    try { sessionStorage.setItem('for', f); } catch (e) {}
+    var more = document.querySelector('section.more'), first = document.querySelector('section.proj');
+    if (!more || !first) return;
+    var order = orders[f];
+    if (f === 'product') {
+      order.forEach(function (id) { var el = document.getElementById(id); if (el) more.parentNode.insertBefore(el, more); });
+    } else {
+      first.parentNode.insertBefore(more, first);
+      var grid = more.querySelector('.mgrid');
+      order.forEach(function (id) { var el = document.getElementById(id); if (el) grid.appendChild(el); });
+      var tpl = document.querySelector('template[data-for="' + f + '"]'), rel = document.querySelector('.hero .stage .rel'), cap = document.querySelector('.hero .cap');
+      if (tpl && rel) { rel.innerHTML = ''; rel.appendChild(tpl.content.cloneNode(true)); if (cap) cap.textContent = tpl.getAttribute('data-cap'); }
+    }
+    var ol = document.querySelector('.index ol');
+    if (ol) order.slice().reverse().forEach(function (id) {
+      var a = ol.querySelector('a[href="#' + id + '"]'); if (a) ol.insertBefore(a.parentNode, ol.firstChild);
+    });
+  })();
+
   /* 0. Motion switch: footer always; header only when the system setting silenced the page. */
   [].forEach.call(document.querySelectorAll('[data-motion]'), function (b) {
     var top = b.classList.contains('motion--top');
